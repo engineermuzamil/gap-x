@@ -1,6 +1,9 @@
 import { motion } from 'framer-motion'
 import { formatDistanceToNow } from 'date-fns'
 import { PencilIcon, Trash2, Pin, PinOff } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import markdownComponents from '../../lib/markdown-components'
 import type { Note } from '../../lib/sort-notes'
 
 interface NoteCardProps {
@@ -11,19 +14,13 @@ interface NoteCardProps {
   onTogglePin: (note: Note) => void
 }
 
-// Extracted into its own function — easy to read and test independently
 function getTimestamp(note: Note): string {
   const created = new Date(note.createdAt).getTime()
   const updated = note.updatedAt ? new Date(note.updatedAt).getTime() : null
-
-  // Consider "edited" only if updated more than 5 seconds after creation
-  // This avoids showing "Updated" on notes that were never manually edited
   const wasEdited = updated !== null && updated - created > 5000
-
   if (wasEdited) {
     return `Updated ${formatDistanceToNow(updated!, { addSuffix: true })}`
   }
-
   return `Created ${formatDistanceToNow(created, { addSuffix: true })}`
 }
 
@@ -35,7 +32,7 @@ export default function NoteCard({ note, viewType, onEdit, onDelete, onTogglePin
     <motion.div
       className={`relative overflow-hidden backdrop-blur-sm bg-[#2C2C2E]/80 border ${
         isPinned ? 'border-[#0A84FF]/50' : 'border-[#3A3A3C]'
-      } ${viewType === 'grid' ? 'h-full rounded-xl' : 'rounded-lg'}`}
+      } ${viewType === 'grid' ? 'rounded-xl break-inside-avoid mb-4' : 'rounded-lg'}`}
       style={{ boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' }}
       whileHover={{ y: -2, scale: 1.01 }}
       whileTap={{ scale: 0.98 }}
@@ -45,7 +42,7 @@ export default function NoteCard({ note, viewType, onEdit, onDelete, onTogglePin
 
       <div className={`p-5 ${viewType === 'list' ? 'flex items-start gap-4' : ''}`}>
         <div className={viewType === 'list' ? 'flex-1' : ''}>
-          <div className="flex justify-between items-start mb-2">
+          <div className="flex justify-between items-start mb-3">
             <h2 className="text-lg font-medium text-white">{note.title}</h2>
 
             <div className="flex items-center gap-1 ml-2 shrink-0">
@@ -84,7 +81,12 @@ export default function NoteCard({ note, viewType, onEdit, onDelete, onTogglePin
             </div>
           </div>
 
-          <p className="text-[#98989D] text-sm leading-relaxed">{note.content}</p>
+          {/* Markdown rendered content */}
+          <div className="text-sm">
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+              {note.content}
+            </ReactMarkdown>
+          </div>
         </div>
       </div>
     </motion.div>

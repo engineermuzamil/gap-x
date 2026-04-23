@@ -22,7 +22,6 @@ export default function Index({ notes }: { notes: Note[] }) {
     pinned: false,
   })
 
-  // Derive sorted notes — no extra state, just a computation
   const sortedNotes = sortNotes(notes, sortBy)
 
   const submit = (e: React.FormEvent) => {
@@ -117,7 +116,7 @@ export default function Index({ notes }: { notes: Note[] }) {
                 animate={{ opacity: 1, y: 0, height: 'auto' }}
                 exit={{ opacity: 0, y: -20, height: 0 }}
                 transition={{ duration: 0.3 }}
-                className="overflow-hidden mb-8"
+                className="overflow-hidden mb-6"
               >
                 <NoteForm
                   data={data}
@@ -131,25 +130,34 @@ export default function Index({ notes }: { notes: Note[] }) {
             )}
           </AnimatePresence>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className={
-              viewType === 'grid'
-                ? 'grid grid-cols-1 items-start gap-4 md:grid-cols-2'
-                : 'flex flex-col gap-3'
-            }
-          >
-            <AnimatePresence>
-              {sortedNotes.length ? (
-                sortedNotes.map((note, index) => (
+          {!sortedNotes.length ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="rounded-2xl border border-dashed border-[#3A3A3C] bg-[#232325] px-6 py-12 text-center"
+            >
+              <h2 className="text-xl font-semibold">No notes yet</h2>
+              <p className="mt-2 text-sm text-[#98989D]">
+                Hit the + button to add your first note.
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className={
+                viewType === 'grid' ? 'columns-1 md:columns-2 gap-3' : 'flex flex-col gap-3'
+              }
+            >
+              <AnimatePresence>
+                {sortedNotes.map((note, index) => (
                   <motion.div
                     key={note.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0, transition: { delay: index * 0.05 } }}
                     exit={{ opacity: 0, scale: 0.9 }}
-                    className="w-full h-full"
+                    className={viewType === 'grid' ? 'break-inside-avoid mb-3' : 'w-full'}
                   >
                     <NoteCard
                       note={note}
@@ -159,21 +167,10 @@ export default function Index({ notes }: { notes: Note[] }) {
                       onTogglePin={handleTogglePin}
                     />
                   </motion.div>
-                ))
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="col-span-2 rounded-2xl border border-dashed border-[#3A3A3C] bg-[#232325] px-6 py-12 text-center"
-                >
-                  <h2 className="text-xl font-semibold">No notes yet</h2>
-                  <p className="mt-2 text-sm text-[#98989D]">
-                    Hit the + button to add your first note.
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          )}
         </div>
       </div>
     </>
