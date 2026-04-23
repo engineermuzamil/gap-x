@@ -1,4 +1,4 @@
-import { Head, useForm, Link, router } from '@inertiajs/react'
+import { Head, useForm, Link, router, usePage } from '@inertiajs/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { PlusIcon, XIcon, ArrowLeft } from 'lucide-react'
@@ -17,7 +17,9 @@ interface Todo {
 
 type ViewType = 'grid' | 'list'
 
-export default function Index({ todos }: { todos: Todo[] }) {
+export default function Index() {
+  const { todos } = usePage<{ todos: Todo[] }>().props
+
   const [isFormVisible, setIsFormVisible] = useState(false)
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
   const [viewType, setViewType] = useState<ViewType>('grid')
@@ -144,9 +146,7 @@ export default function Index({ todos }: { todos: Todo[] }) {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
               className={
-                viewType === 'grid'
-                  ? 'grid grid-cols-1 items-start gap-4 md:grid-cols-2'
-                  : 'flex flex-col gap-3'
+                viewType === 'grid' ? 'columns-1 md:columns-2 gap-3' : 'flex flex-col gap-3'
               }
             >
               <AnimatePresence>
@@ -156,7 +156,7 @@ export default function Index({ todos }: { todos: Todo[] }) {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0, transition: { delay: index * 0.05 } }}
                     exit={{ opacity: 0, scale: 0.9 }}
-                    className="w-full h-full"
+                    className={viewType === 'grid' ? 'break-inside-avoid mb-3' : 'w-full'}
                   >
                     <TodoCard
                       todo={todo}

@@ -1,4 +1,4 @@
-import { Head, useForm, Link, router } from '@inertiajs/react'
+import { Head, useForm, Link, router, usePage } from '@inertiajs/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { PlusIcon, XIcon, ArrowLeft } from 'lucide-react'
@@ -27,7 +27,10 @@ interface PaginatedProjects {
 
 type ViewType = 'grid' | 'list'
 
-export default function Index({ projects }: { projects: PaginatedProjects }) {
+export default function Index() {
+  // usePage() pulls props from Inertia
+  const { projects } = usePage<{ projects: PaginatedProjects }>().props
+
   const [isFormVisible, setIsFormVisible] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
   const [viewType, setViewType] = useState<ViewType>('grid')
@@ -125,7 +128,7 @@ export default function Index({ projects }: { projects: PaginatedProjects }) {
                 animate={{ opacity: 1, y: 0, height: 'auto' }}
                 exit={{ opacity: 0, y: -20, height: 0 }}
                 transition={{ duration: 0.3 }}
-                className="overflow-hidden mb-8"
+                className="overflow-hidden mb-6"
               >
                 <ProjectForm
                   data={data}
@@ -139,25 +142,34 @@ export default function Index({ projects }: { projects: PaginatedProjects }) {
             )}
           </AnimatePresence>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className={
-              viewType === 'grid'
-                ? 'grid grid-cols-1 items-start gap-4 md:grid-cols-2'
-                : 'flex flex-col gap-3'
-            }
-          >
-            <AnimatePresence>
-              {projects.data.length ? (
-                projects.data.map((project, index) => (
+          {!projects.data.length ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="rounded-2xl border border-dashed border-[#3A3A3C] bg-[#232325] px-6 py-12 text-center"
+            >
+              <h2 className="text-xl font-semibold">No projects yet</h2>
+              <p className="mt-2 text-sm text-[#98989D]">
+                Hit the + button to add your first project.
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className={
+                viewType === 'grid' ? 'columns-1 md:columns-2 gap-3' : 'flex flex-col gap-3'
+              }
+            >
+              <AnimatePresence>
+                {projects.data.map((project, index) => (
                   <motion.div
                     key={project.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0, transition: { delay: index * 0.05 } }}
                     exit={{ opacity: 0, scale: 0.9 }}
-                    className="w-full h-full"
+                    className={viewType === 'grid' ? 'break-inside-avoid mb-3' : 'w-full'}
                   >
                     <ProjectCard
                       project={project}
@@ -166,22 +178,12 @@ export default function Index({ projects }: { projects: PaginatedProjects }) {
                       onDelete={handleDelete}
                     />
                   </motion.div>
-                ))
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="col-span-2 rounded-2xl border border-dashed border-[#3A3A3C] bg-[#232325] px-6 py-12 text-center"
-                >
-                  <h2 className="text-xl font-semibold">No projects yet</h2>
-                  <p className="mt-2 text-sm text-[#98989D]">
-                    Hit the + button to add your first project.
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          )}
 
+          {/* Pagination */}
           {projects.meta.lastPage > 1 && (
             <div className="flex justify-center items-center gap-2 mt-8">
               {Array.from({ length: projects.meta.lastPage }, (_, i) => i + 1).map((page) => (

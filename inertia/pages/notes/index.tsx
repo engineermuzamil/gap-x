@@ -1,4 +1,4 @@
-import { Head, useForm, Link, router } from '@inertiajs/react'
+import { Head, useForm, Link, router, usePage } from '@inertiajs/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { PlusIcon, XIcon, ArrowLeft } from 'lucide-react'
@@ -10,7 +10,9 @@ import { sortNotes, type SortOption, type Note } from '../../lib/sort-notes'
 
 type ViewType = 'grid' | 'list'
 
-export default function Index({ notes }: { notes: Note[] }) {
+export default function Index() {
+  const { notes } = usePage<{ notes: Note[] }>().props
+
   const [isFormVisible, setIsFormVisible] = useState(false)
   const [editingNote, setEditingNote] = useState<Note | null>(null)
   const [viewType, setViewType] = useState<ViewType>('grid')

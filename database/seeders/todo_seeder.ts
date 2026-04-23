@@ -8,7 +8,7 @@ export default class TodoSeeder extends BaseSeeder {
         title: 'Set up AdonisJS project',
         description:
           'Clone the repo, install dependencies, configure .env file and run migrations to get the project running locally.',
-        isCompleted: true,
+        isCompleted: false,
       },
       {
         title: 'Understand MVC architecture',
@@ -20,7 +20,7 @@ export default class TodoSeeder extends BaseSeeder {
         title: 'Create Notes module',
         description:
           'Build the full CRUD for notes including migration, model, controller, routes, and React frontend with Inertia.js.',
-        isCompleted: true,
+        isCompleted: false,
       },
       {
         title: 'Create Todos module',
@@ -32,7 +32,7 @@ export default class TodoSeeder extends BaseSeeder {
         title: 'Create Projects module',
         description:
           'Build projects with status management using enums (pending, in-progress, completed) and pagination support.',
-        isCompleted: false,
+        isCompleted: true,
       },
       {
         title: 'Implement pagination for Projects',
@@ -44,7 +44,7 @@ export default class TodoSeeder extends BaseSeeder {
         title: 'Write seeders for all modules',
         description:
           'Create seed data for Notes, Todos, and Projects so the app has realistic content for testing and demos.',
-        isCompleted: false,
+        isCompleted: true,
       },
     ])
   }
