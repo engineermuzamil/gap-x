@@ -5,8 +5,9 @@ interface NoteFormProps {
   data: {
     title: string
     content: string
+    pinned: boolean
   }
-  setData: (field: string, value: string) => void
+  setData: (field: string, value: any) => void
   submit: (e: React.FormEvent) => void
   processing: boolean
   handleKeyDown: (e: React.KeyboardEvent) => void
@@ -55,6 +56,21 @@ export default function NoteForm({
             className="w-full px-4 py-3 bg-[#3A3A3C] text-white placeholder-[#98989D] rounded-lg border-none focus:ring-2 focus:ring-[#0A84FF] focus:outline-none min-h-[120px] transition-all duration-200"
             required
           />
+        </div>
+
+        {/* Pin toggle */}
+        <div className="mb-4 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setData('pinned', !data.pinned)}
+            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${
+              data.pinned
+                ? 'border-[#0A84FF] text-[#0A84FF] bg-[#0A84FF]/10'
+                : 'border-[#3A3A3C] text-[#98989D] hover:text-white'
+            }`}
+          >
+            {data.pinned ? 'Pinned ✓' : 'Pin this note'}
+          </button>
         </div>
 
         <motion.button

@@ -5,15 +5,8 @@ import { PlusIcon, XIcon, ArrowLeft } from 'lucide-react'
 import NoteCard from './note-card'
 import NoteForm from './note-form'
 import ViewSwitcher from './view-switcher'
-
-interface Note {
-  id: number
-  title: string
-  content: string
-  pinned: boolean
-  createdAt: string
-  updatedAt: string | null
-}
+import SortSelector from './sort-selector'
+import { sortNotes, type SortOption, type Note } from '../../lib/sort-notes'
 
 type ViewType = 'grid' | 'list'
 
@@ -21,12 +14,16 @@ export default function Index({ notes }: { notes: Note[] }) {
   const [isFormVisible, setIsFormVisible] = useState(false)
   const [editingNote, setEditingNote] = useState<Note | null>(null)
   const [viewType, setViewType] = useState<ViewType>('grid')
+  const [sortBy, setSortBy] = useState<SortOption>('pinned')
 
   const { data, setData, post, put, processing, reset } = useForm({
     title: '',
     content: '',
     pinned: false,
   })
+
+  // Derive sorted notes — no extra state, just a computation
+  const sortedNotes = sortNotes(notes, sortBy)
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -101,6 +98,7 @@ export default function Index({ notes }: { notes: Note[] }) {
             </div>
 
             <div className="flex items-center gap-3">
+              <SortSelector value={sortBy} onChange={setSortBy} />
               <ViewSwitcher currentView={viewType} onChange={setViewType} />
               <motion.button
                 whileTap={{ scale: 0.95 }}
@@ -140,8 +138,8 @@ export default function Index({ notes }: { notes: Note[] }) {
             className={viewType === 'grid' ? 'columns-1 md:columns-2 gap-4' : 'flex flex-col gap-3'}
           >
             <AnimatePresence>
-              {notes.length ? (
-                notes.map((note, index) => (
+              {sortedNotes.length ? (
+                sortedNotes.map((note, index) => (
                   <motion.div
                     key={note.id}
                     initial={{ opacity: 0, y: 20 }}

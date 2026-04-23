@@ -3,14 +3,8 @@ import Note from '#models/note'
 
 export default class NotesController {
   async index({ inertia }: HttpContext) {
-    const notes = await Note.query().orderByRaw('pinned DESC').orderBy('created_at', 'desc')
-
-    const serialized = notes.map((note) => ({
-      ...note.serialize(),
-      pinned: Boolean(note.pinned),
-    }))
-
-    return inertia.render('notes/index', { notes: serialized } as never)
+    const notes = await Note.all()
+    return inertia.render('notes/index' as any, { notes } as any)
   }
 
   async store({ request, response }: HttpContext) {

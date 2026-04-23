@@ -20,6 +20,7 @@ declare module '@adonisjs/inertia/types' {
     'notes/index': ExtractProps<(typeof import('../../inertia/pages/notes/index.tsx'))['default']>
     'notes/note-card': ExtractProps<(typeof import('../../inertia/pages/notes/note-card.tsx'))['default']>
     'notes/note-form': ExtractProps<(typeof import('../../inertia/pages/notes/note-form.tsx'))['default']>
+    'notes/sort-selector': ExtractProps<(typeof import('../../inertia/pages/notes/sort-selector.tsx'))['default']>
     'notes/view-switcher': ExtractProps<(typeof import('../../inertia/pages/notes/view-switcher.tsx'))['default']>
     'projects/index': ExtractProps<(typeof import('../../inertia/pages/projects/index.tsx'))['default']>
     'projects/project-card': ExtractProps<(typeof import('../../inertia/pages/projects/project-card.tsx'))['default']>
