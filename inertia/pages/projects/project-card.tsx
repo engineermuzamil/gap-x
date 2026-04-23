@@ -36,7 +36,7 @@ export default function ProjectCard({ project, viewType, onEdit, onDelete }: Pro
   return (
     <motion.div
       className={`relative overflow-hidden backdrop-blur-sm bg-[#2C2C2E]/80 border border-[#3A3A3C] ${
-        viewType === 'grid' ? 'rounded-xl break-inside-avoid mb-4' : 'rounded-lg'
+        viewType === 'grid' ? 'h-full rounded-xl' : 'rounded-lg'
       }`}
       style={{ boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' }}
       whileHover={{ y: -2, scale: 1.01 }}

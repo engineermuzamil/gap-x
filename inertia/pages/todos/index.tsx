@@ -143,7 +143,11 @@ export default function Index({ todos }: { todos: Todo[] }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className={viewType === 'grid' ? 'columns-1 md:columns-2 gap-4' : 'flex flex-col gap-3'}
+              className={
+                viewType === 'grid'
+                  ? 'grid grid-cols-1 items-start gap-4 md:grid-cols-2'
+                  : 'flex flex-col gap-3'
+              }
             >
               <AnimatePresence>
                 {todos.map((todo, index) => (
@@ -152,7 +156,7 @@ export default function Index({ todos }: { todos: Todo[] }) {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0, transition: { delay: index * 0.05 } }}
                     exit={{ opacity: 0, scale: 0.9 }}
-                    className={viewType === 'list' ? 'w-full' : ''}
+                    className="w-full h-full"
                   >
                     <TodoCard
                       todo={todo}
