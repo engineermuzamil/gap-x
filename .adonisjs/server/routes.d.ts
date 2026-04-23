@@ -15,7 +15,6 @@ export type ScannedRoutes = {
     'notes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.index': { paramsTuple?: []; params?: {} }
-    'todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.store': { paramsTuple?: []; params?: {} }
     'todos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -30,7 +29,6 @@ export type ScannedRoutes = {
     'session.create': { paramsTuple?: []; params?: {} }
     'notes.index': { paramsTuple?: []; params?: {} }
     'todos.index': { paramsTuple?: []; params?: {} }
-    'todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'projects.index': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
@@ -39,7 +37,6 @@ export type ScannedRoutes = {
     'session.create': { paramsTuple?: []; params?: {} }
     'notes.index': { paramsTuple?: []; params?: {} }
     'todos.index': { paramsTuple?: []; params?: {} }
-    'todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'projects.index': { paramsTuple?: []; params?: {} }
   }
   POST: {

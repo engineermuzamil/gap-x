@@ -139,18 +139,6 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/todos_controller').default['index']>>>
     }
   }
-  'todos.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/todos/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/todos_controller').default['show']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/todos_controller').default['show']>>>
-    }
-  }
   'todos.store': {
     methods: ["POST"]
     pattern: '/todos'

@@ -20,7 +20,6 @@ export interface ApiDefinition {
   }
   todos: {
     index: typeof routes['todos.index']
-    show: typeof routes['todos.show']
     store: typeof routes['todos.store']
     update: typeof routes['todos.update']
     destroy: typeof routes['todos.destroy']

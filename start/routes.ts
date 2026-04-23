@@ -3,8 +3,10 @@ import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
 import router from '@adonisjs/core/services/router'
 
+// Homepage
 router.on('/').renderInertia('home', {}).as('home')
 
+// Authentication
 router
   .group(() => {
     router.get('signup', [controllers.NewAccount, 'create'])
@@ -21,20 +23,34 @@ router
   .use(middleware.auth())
 
 // Notes
-router.get('/notes', [controllers.Notes, 'index']).as('notes.index')
-router.post('/notes', [controllers.Notes, 'store']).as('notes.store')
-router.put('/notes/:id', [controllers.Notes, 'update']).as('notes.update')
-router.delete('/notes/:id', [controllers.Notes, 'destroy']).as('notes.destroy')
+router
+  .group(() => {
+    router.get('/', [controllers.Notes, 'index']).as('index')
+    router.post('/', [controllers.Notes, 'store']).as('store')
+    router.put('/:id', [controllers.Notes, 'update']).as('update')
+    router.delete('/:id', [controllers.Notes, 'destroy']).as('destroy')
+  })
+  .prefix('/notes')
+  .as('notes')
 
 // Todos
-router.get('/todos', [controllers.Todos, 'index']).as('todos.index')
-router.get('/todos/:id', [controllers.Todos, 'show']).as('todos.show')
-router.post('/todos', [controllers.Todos, 'store']).as('todos.store')
-router.put('/todos/:id', [controllers.Todos, 'update']).as('todos.update')
-router.delete('/todos/:id', [controllers.Todos, 'destroy']).as('todos.destroy')
+router
+  .group(() => {
+    router.get('/', [controllers.Todos, 'index']).as('index')
+    router.post('/', [controllers.Todos, 'store']).as('store')
+    router.put('/:id', [controllers.Todos, 'update']).as('update')
+    router.delete('/:id', [controllers.Todos, 'destroy']).as('destroy')
+  })
+  .prefix('/todos')
+  .as('todos')
 
 // Projects
-router.get('/projects', [controllers.Projects, 'index']).as('projects.index')
-router.post('/projects', [controllers.Projects, 'store']).as('projects.store')
-router.put('/projects/:id', [controllers.Projects, 'update']).as('projects.update')
-router.delete('/projects/:id', [controllers.Projects, 'destroy']).as('projects.destroy')
+router
+  .group(() => {
+    router.get('/', [controllers.Projects, 'index']).as('index')
+    router.post('/', [controllers.Projects, 'store']).as('store')
+    router.put('/:id', [controllers.Projects, 'update']).as('update')
+    router.delete('/:id', [controllers.Projects, 'destroy']).as('destroy')
+  })
+  .prefix('/projects')
+  .as('projects')

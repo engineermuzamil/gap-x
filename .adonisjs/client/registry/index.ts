@@ -72,12 +72,6 @@ const routes = {
     tokens: [{"old":"/todos","type":0,"val":"todos","end":""}],
     types: placeholder as Registry['todos.index']['types'],
   },
-  'todos.show': {
-    methods: ["GET","HEAD"],
-    pattern: '/todos/:id',
-    tokens: [{"old":"/todos/:id","type":0,"val":"todos","end":""},{"old":"/todos/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['todos.show']['types'],
-  },
   'todos.store': {
     methods: ["POST"],
     pattern: '/todos',
