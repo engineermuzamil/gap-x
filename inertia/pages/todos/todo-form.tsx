@@ -1,17 +1,21 @@
 import type React from 'react'
 import { motion } from 'framer-motion'
+import LabelPicker from '../../lib/label-picker'
+import type { Label } from '../../lib/types'
 
 interface TodoFormProps {
   data: {
     title: string
     description: string
     isCompleted: boolean
+    labelIds: number[]
   }
-  setData: (field: string, value: string | boolean) => void
+  setData: (field: string, value: any) => void
   submit: (e: React.FormEvent) => void
   processing: boolean
   handleKeyDown: (e: React.KeyboardEvent) => void
   isEditing: boolean
+  allLabels: Label[]
 }
 
 export default function TodoForm({
@@ -21,6 +25,7 @@ export default function TodoForm({
   processing,
   handleKeyDown,
   isEditing,
+  allLabels,
 }: TodoFormProps) {
   return (
     <motion.div
@@ -56,6 +61,13 @@ export default function TodoForm({
             className="w-full px-4 py-3 bg-[#3A3A3C] text-white placeholder-[#98989D] rounded-lg border-none focus:ring-2 focus:ring-[#0A84FF] focus:outline-none min-h-[120px] transition-all duration-200"
           />
         </div>
+
+        {/* Label picker */}
+        <LabelPicker
+          allLabels={allLabels}
+          selectedIds={data.labelIds}
+          onChange={(ids) => setData('labelIds', ids)}
+        />
 
         <label className="flex items-center gap-3 mb-4 text-sm text-[#98989D]">
           <input

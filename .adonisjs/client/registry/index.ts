@@ -42,6 +42,12 @@ const routes = {
     tokens: [{"old":"/logout","type":0,"val":"logout","end":""}],
     types: placeholder as Registry['session.destroy']['types'],
   },
+  'notes.showShared': {
+    methods: ["GET","HEAD"],
+    pattern: '/notes/share/:token',
+    tokens: [{"old":"/notes/share/:token","type":0,"val":"notes","end":""},{"old":"/notes/share/:token","type":0,"val":"share","end":""},{"old":"/notes/share/:token","type":1,"val":"token","end":""}],
+    types: placeholder as Registry['notes.showShared']['types'],
+  },
   'notes.index': {
     methods: ["GET","HEAD"],
     pattern: '/notes',
@@ -66,6 +72,36 @@ const routes = {
     tokens: [{"old":"/notes/:id","type":0,"val":"notes","end":""},{"old":"/notes/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['notes.destroy']['types'],
   },
+  'notes.restore': {
+    methods: ["POST"],
+    pattern: '/notes/:id/restore',
+    tokens: [{"old":"/notes/:id/restore","type":0,"val":"notes","end":""},{"old":"/notes/:id/restore","type":1,"val":"id","end":""},{"old":"/notes/:id/restore","type":0,"val":"restore","end":""}],
+    types: placeholder as Registry['notes.restore']['types'],
+  },
+  'notes.forceDestroy': {
+    methods: ["DELETE"],
+    pattern: '/notes/:id/force',
+    tokens: [{"old":"/notes/:id/force","type":0,"val":"notes","end":""},{"old":"/notes/:id/force","type":1,"val":"id","end":""},{"old":"/notes/:id/force","type":0,"val":"force","end":""}],
+    types: placeholder as Registry['notes.forceDestroy']['types'],
+  },
+  'notes.upload': {
+    methods: ["POST"],
+    pattern: '/notes/upload',
+    tokens: [{"old":"/notes/upload","type":0,"val":"notes","end":""},{"old":"/notes/upload","type":0,"val":"upload","end":""}],
+    types: placeholder as Registry['notes.upload']['types'],
+  },
+  'notes.share': {
+    methods: ["POST"],
+    pattern: '/notes/:id/share',
+    tokens: [{"old":"/notes/:id/share","type":0,"val":"notes","end":""},{"old":"/notes/:id/share","type":1,"val":"id","end":""},{"old":"/notes/:id/share","type":0,"val":"share","end":""}],
+    types: placeholder as Registry['notes.share']['types'],
+  },
+  'notes.unshare': {
+    methods: ["DELETE"],
+    pattern: '/notes/:id/share',
+    tokens: [{"old":"/notes/:id/share","type":0,"val":"notes","end":""},{"old":"/notes/:id/share","type":1,"val":"id","end":""},{"old":"/notes/:id/share","type":0,"val":"share","end":""}],
+    types: placeholder as Registry['notes.unshare']['types'],
+  },
   'todos.index': {
     methods: ["GET","HEAD"],
     pattern: '/todos',
@@ -77,6 +113,12 @@ const routes = {
     pattern: '/todos',
     tokens: [{"old":"/todos","type":0,"val":"todos","end":""}],
     types: placeholder as Registry['todos.store']['types'],
+  },
+  'todos.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/todos/:id',
+    tokens: [{"old":"/todos/:id","type":0,"val":"todos","end":""},{"old":"/todos/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['todos.show']['types'],
   },
   'todos.update': {
     methods: ["PUT"],

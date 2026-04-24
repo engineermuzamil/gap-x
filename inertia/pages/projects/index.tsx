@@ -5,25 +5,7 @@ import { PlusIcon, XIcon, ArrowLeft } from 'lucide-react'
 import ProjectCard from './project-card'
 import ProjectForm from './project-form'
 import ViewSwitcher from '../notes/view-switcher'
-
-interface Project {
-  id: number
-  title: string
-  description: string
-  status: 'pending' | 'in-progress' | 'completed'
-  createdAt: string
-  updatedAt: string
-}
-
-interface PaginatedProjects {
-  data: Project[]
-  meta: {
-    currentPage: number
-    lastPage: number
-    perPage: number
-    total: number
-  }
-}
+import type { Project, PaginatedProjects, ProjectStatus } from '../../lib/types'
 
 type ViewType = 'grid' | 'list'
 
@@ -38,7 +20,7 @@ export default function Index() {
   const { data, setData, post, put, processing, reset } = useForm({
     title: '',
     description: '',
-    status: 'pending' as 'pending' | 'in-progress' | 'completed',
+    status: 'pending' as ProjectStatus,
   })
 
   const submit = (e: React.FormEvent) => {

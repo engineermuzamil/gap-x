@@ -1,38 +1,27 @@
-export type SortOption = 'pinned' | 'created_desc' | 'created_asc' | 'updated_desc' | 'updated_asc'
+// inertia/lib/sort-notes.ts
+import type { Note, SortOption } from './types'
 
-export interface Note {
-  id: number
-  title: string
-  content: string
-  pinned: boolean
-  createdAt: string
-  updatedAt: string | null
-}
+const time = (date: string) => new Date(date).getTime()
+const updatedOrCreated = (note: Note) => time(note.updatedAt ?? note.createdAt)
 
 export function sortNotes(notes: Note[], sortBy: SortOption): Note[] {
   return [...notes].sort((a, b) => {
     switch (sortBy) {
       case 'pinned':
         if (a.pinned !== b.pinned) return a.pinned ? -1 : 1
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        return time(b.createdAt) - time(a.createdAt)
 
       case 'created_desc':
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        return time(b.createdAt) - time(a.createdAt)
 
       case 'created_asc':
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        return time(a.createdAt) - time(b.createdAt)
 
       case 'updated_desc':
-        return (
-          new Date(b.updatedAt ?? b.createdAt).getTime() -
-          new Date(a.updatedAt ?? a.createdAt).getTime()
-        )
+        return updatedOrCreated(b) - updatedOrCreated(a)
 
       case 'updated_asc':
-        return (
-          new Date(a.updatedAt ?? a.createdAt).getTime() -
-          new Date(b.updatedAt ?? b.createdAt).getTime()
-        )
+        return updatedOrCreated(a) - updatedOrCreated(b)
 
       default:
         return 0

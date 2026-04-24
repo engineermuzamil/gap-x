@@ -30,5 +30,8 @@ declare module '@adonisjs/inertia/types' {
     'todos/todo-card': ExtractProps<(typeof import('../../inertia/pages/todos/todo-card.tsx'))['default']>
     'todos/todo-form': ExtractProps<(typeof import('../../inertia/pages/todos/todo-form.tsx'))['default']>
     'todos/view-switcher': ExtractProps<(typeof import('../../inertia/pages/todos/view-switcher.tsx'))['default']>
+    'notes/shared-note': ExtractProps<(typeof import('../../inertia/pages/notes/shared-note.tsx'))['default']>
+    'notes/flash-toast': ExtractProps<(typeof import('../../inertia/pages/notes/flash-toast.tsx'))['default']>
+    'notes/trash-section': ExtractProps<(typeof import('../../inertia/pages/notes/trash-section.tsx'))['default']>
   }
 }

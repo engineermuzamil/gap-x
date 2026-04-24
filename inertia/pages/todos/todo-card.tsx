@@ -1,15 +1,8 @@
 import { motion } from 'framer-motion'
 import { formatDistanceToNow } from 'date-fns'
 import { CheckCircle2, Circle, PencilIcon, Trash2 } from 'lucide-react'
-
-interface Todo {
-  id: number
-  title: string
-  description: string | null
-  isCompleted: boolean
-  createdAt: string
-  updatedAt: string
-}
+import { getLabelColor } from '../../lib/label-colors'
+import type { Todo } from '../../lib/types'
 
 interface TodoCardProps {
   todo: Todo
@@ -19,6 +12,16 @@ interface TodoCardProps {
   onToggleComplete: (todo: Todo) => void
 }
 
+function getTimestamp(todo: Todo): string {
+  const created = new Date(todo.createdAt).getTime()
+  const updated = todo.updatedAt ? new Date(todo.updatedAt).getTime() : null
+  const wasEdited = updated !== null && updated - created > 5000
+  if (wasEdited) {
+    return `Updated ${formatDistanceToNow(updated!, { addSuffix: true })}`
+  }
+  return `Created ${formatDistanceToNow(created, { addSuffix: true })}`
+}
+
 export default function TodoCard({
   todo,
   viewType,
@@ -26,7 +29,7 @@ export default function TodoCard({
   onDelete,
   onToggleComplete,
 }: TodoCardProps) {
-  const timeAgo = formatDistanceToNow(new Date(todo.createdAt), { addSuffix: true })
+  const timestamp = getTimestamp(todo)
 
   return (
     <motion.div
@@ -40,6 +43,7 @@ export default function TodoCard({
     >
       <div className={`p-5 ${viewType === 'list' ? 'flex items-start gap-4' : ''}`}>
         <div className={viewType === 'list' ? 'flex-1' : ''}>
+          {/* Title row + action buttons */}
           <div className="flex justify-between items-start mb-2">
             <div className="flex items-start gap-3 flex-1">
               <button
@@ -54,14 +58,16 @@ export default function TodoCard({
                 )}
               </button>
               <h2
-                className={`text-lg font-medium ${todo.isCompleted ? 'text-[#98989D] line-through' : 'text-white'}`}
+                className={`text-lg font-medium ${
+                  todo.isCompleted ? 'text-[#98989D] line-through' : 'text-white'
+                }`}
               >
                 {todo.title}
               </h2>
             </div>
 
             <div className="flex items-center gap-1 ml-2 shrink-0">
-              <span className="text-xs text-[#98989D] mr-1">{timeAgo}</span>
+              <span className="text-xs text-[#98989D] mr-1">{timestamp}</span>
               <button
                 type="button"
                 onClick={() => onEdit(todo)}
@@ -78,6 +84,20 @@ export default function TodoCard({
               </button>
             </div>
           </div>
+
+          {/* Label chips */}
+          {todo.labels.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-2 ml-8">
+              {todo.labels.map((label) => {
+                const { bg, text } = getLabelColor(label.name)
+                return (
+                  <span key={label.id} className={`text-xs px-2 py-0.5 rounded-full ${bg} ${text}`}>
+                    {label.name}
+                  </span>
+                )
+              })}
+            </div>
+          )}
 
           {todo.description && (
             <p className="text-[#98989D] text-sm leading-relaxed ml-8">{todo.description}</p>

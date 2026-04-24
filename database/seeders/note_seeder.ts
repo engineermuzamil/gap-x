@@ -1,9 +1,16 @@
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import Note from '#models/note'
+import Label from '#models/label'
 
 export default class NoteSeeder extends BaseSeeder {
   async run() {
-    await Note.createMany([
+    // Fetch all labels by name so we can attach them by ID
+    const labels = await Label.all()
+
+    // Helper: find a label's id by name
+    const id = (name: string) => labels.find((l) => l.name === name)!.id
+
+    const notes = await Note.createMany([
       {
         title: 'AdonisJS Project Setup',
         content: `## Getting Started
@@ -43,12 +50,12 @@ No separate REST API needed — Inertia bridges backend and frontend directly.`,
         title: 'Lucid ORM Basics',
         content: `## Common Lucid Operations
 
-**Fetch all records:**
+**Fetch all:**
 \`\`\`ts
 const notes = await Note.all()
 \`\`\`
 
-**Fetch one by id:**
+**Find by id:**
 \`\`\`ts
 const note = await Note.find(id)
 \`\`\`
@@ -60,7 +67,7 @@ await Note.create({ title, content })
 
 **Update:**
 \`\`\`ts
-await note.merge({ title, content }).save()
+await note.merge({ title }).save()
 \`\`\`
 
 **Delete:**
@@ -74,13 +81,11 @@ await note.delete()
         content: `## How Inertia Works
 
 1. User visits \`/notes\`
-2. AdonisJS route calls \`NotesController.index()\`
-3. Controller fetches data and calls \`inertia.render('notes/index', { notes })\`
-4. React component receives \`notes\` as props directly
+2. AdonisJS controller fetches data
+3. Controller calls \`inertia.render('notes/index', { notes })\`
+4. React component receives \`notes\` as props
 
-**No fetch. No axios. No REST API.**
-
-> Think of Inertia as the glue between your AdonisJS backend and React frontend.`,
+**No fetch. No axios. No REST API.**`,
         pinned: false,
       },
       {
@@ -91,29 +96,31 @@ await note.delete()
 |---------|-------------|
 | \`node ace migration:run\` | Run pending migrations |
 | \`node ace migration:rollback\` | Undo last batch |
-| \`node ace migration:fresh\` | Drop all tables and re-run |
-| \`node ace migration:fresh --seed\` | Fresh + seed data |
-
-> Always run migrations before seeders to avoid errors.`,
+| \`node ace migration:fresh\` | Drop all & re-run |
+| \`node ace migration:fresh --seed\` | Fresh + seed |`,
         pinned: false,
       },
       {
-        title: 'Seeders vs Migrations',
-        content: `## Key Difference
+        title: 'Healthy Habits Tracker',
+        content: `## Daily Goals
 
-- **Migrations** define the *structure* of your database (tables, columns, indexes)
-- **Seeders** populate the database with *data* (test records, defaults)
+- [ ] Drink 8 glasses of water
+- [ ] 30 min walk or workout
+- [ ] Sleep before midnight
+- [ ] No screens 1hr before bed
 
-### Order matters
-
-\`\`\`bash
-node ace migration:run   # structure first
-node ace db:seed         # data second
-\`\`\`
-
-Never run seeders before migrations — the tables won't exist yet.`,
+> Small consistent habits beat big sporadic efforts.`,
         pinned: false,
       },
     ])
+
+    // Attach labels to each note using the pivot table
+    // related('labels').attach() inserts rows into note_labels
+    await notes[0].related('labels').attach([id('Learning'), id('Work')])
+    await notes[1].related('labels').attach([id('Learning')])
+    await notes[2].related('labels').attach([id('Learning')])
+    await notes[3].related('labels').attach([id('Learning'), id('Ideas')])
+    await notes[4].related('labels').attach([id('Work'), id('Learning')])
+    await notes[5].related('labels').attach([id('Health'), id('Personal')])
   }
 }

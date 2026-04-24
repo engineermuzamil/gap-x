@@ -5,20 +5,13 @@ import { PlusIcon, XIcon, ArrowLeft } from 'lucide-react'
 import TodoCard from './todo-card'
 import TodoForm from './todo-form'
 import ViewSwitcher from '../notes/view-switcher'
-
-interface Todo {
-  id: number
-  title: string
-  description: string | null
-  isCompleted: boolean
-  createdAt: string
-  updatedAt: string
-}
+import type { Todo, Label } from '../../lib/types'
 
 type ViewType = 'grid' | 'list'
 
 export default function Index() {
-  const { todos } = usePage<{ todos: Todo[] }>().props
+  // labels comes from the controller alongside todos
+  const { todos, labels } = usePage<{ todos: Todo[]; labels: Label[] }>().props
 
   const [isFormVisible, setIsFormVisible] = useState(false)
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
@@ -28,6 +21,7 @@ export default function Index() {
     title: '',
     description: '',
     isCompleted: false,
+    labelIds: [] as number[], // tracks which labels are selected
   })
 
   const submit = (e: React.FormEvent) => {
@@ -56,6 +50,8 @@ export default function Index() {
       title: todo.title,
       description: todo.description ?? '',
       isCompleted: todo.isCompleted,
+      // Pre-fill the picker with the todo's current label IDs
+      labelIds: todo.labels.map((l) => l.id),
     })
     setIsFormVisible(true)
   }
@@ -69,6 +65,8 @@ export default function Index() {
       title: todo.title,
       description: todo.description,
       isCompleted: !todo.isCompleted,
+      // Keep existing labels unchanged during a complete toggle
+      labelIds: todo.labels.map((l) => l.id),
     })
   }
 
@@ -134,6 +132,7 @@ export default function Index() {
                   processing={processing}
                   handleKeyDown={handleKeyDown}
                   isEditing={!!editingTodo}
+                  allLabels={labels}
                 />
               </motion.div>
             )}

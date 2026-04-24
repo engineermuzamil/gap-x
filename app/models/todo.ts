@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column, manyToMany } from '@adonisjs/lucid/orm'
+import type { ManyToMany } from '@adonisjs/lucid/types/relations'
+import Label from '#models/label'
 
 export default class Todo extends BaseModel {
   @column({ isPrimary: true })
@@ -11,8 +13,13 @@ export default class Todo extends BaseModel {
   @column()
   declare description: string | null
 
-  @column({ columnName: 'is_completed' })
+  @column()
   declare isCompleted: boolean
+
+  @manyToMany(() => Label, {
+    pivotTable: 'todo_labels',
+  })
+  declare labels: ManyToMany<typeof Label>
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

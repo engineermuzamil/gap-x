@@ -6,12 +6,18 @@ import NoteCard from './note-card'
 import NoteForm from './note-form'
 import ViewSwitcher from './view-switcher'
 import SortSelector from './sort-selector'
-import { sortNotes, type SortOption, type Note } from '../../lib/sort-notes'
+import TrashSection from './trash-section'
+import { sortNotes } from '../../lib/sort-notes'
+import type { SortOption, Note, Label } from '../../lib/types'
 
 type ViewType = 'grid' | 'list'
 
 export default function Index() {
-  const { notes } = usePage<{ notes: Note[] }>().props
+  const { notes, trashedNotes, labels } = usePage<{
+    notes: Note[]
+    trashedNotes: Note[]
+    labels: Label[]
+  }>().props
 
   const [isFormVisible, setIsFormVisible] = useState(false)
   const [editingNote, setEditingNote] = useState<Note | null>(null)
@@ -22,11 +28,14 @@ export default function Index() {
     title: '',
     content: '',
     pinned: false,
+    labelIds: [] as number[],
+    imageUrl: null as string | null,
+    removeImage: false,
   })
 
   const sortedNotes = sortNotes(notes, sortBy)
-  const pinnedNotes = sortedNotes.filter((note) => note.pinned)
-  const unpinnedNotes = sortedNotes.filter((note) => !note.pinned)
+  const pinnedNotes = sortedNotes.filter((n) => n.pinned)
+  const unpinnedNotes = sortedNotes.filter((n) => !n.pinned)
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,7 +59,14 @@ export default function Index() {
 
   const handleEdit = (note: Note) => {
     setEditingNote(note)
-    setData({ title: note.title, content: note.content, pinned: note.pinned })
+    setData({
+      title: note.title,
+      content: note.content,
+      pinned: note.pinned,
+      labelIds: note.labels.map((l) => l.id),
+      imageUrl: null,
+      removeImage: false,
+    })
     setIsFormVisible(true)
   }
 
@@ -63,6 +79,10 @@ export default function Index() {
       title: note.title,
       content: note.content,
       pinned: !note.pinned,
+      labelIds: note.labels.map((l) => l.id),
+      imageUrl: null,
+      removeImage: false,
+      pinToggle: true,
     })
   }
 
@@ -129,6 +149,8 @@ export default function Index() {
                   processing={processing}
                   handleKeyDown={handleKeyDown}
                   isEditing={!!editingNote}
+                  allLabels={labels}
+                  existingImageUrl={editingNote?.imageUrl ?? null}
                 />
               </motion.div>
             )}
@@ -147,7 +169,7 @@ export default function Index() {
             </motion.div>
           ) : (
             <div className="space-y-6">
-              {/* Pinned section — regular grid so cards sit side by side cleanly */}
+              {/* Pinned section */}
               {pinnedNotes.length > 0 && (
                 <section>
                   <div className="flex items-center gap-3 mb-3">
@@ -156,7 +178,6 @@ export default function Index() {
                     </h2>
                     <div className="h-px flex-1 bg-[#0A84FF]/30" />
                   </div>
-
                   <div
                     className={
                       viewType === 'grid'
@@ -186,7 +207,7 @@ export default function Index() {
                 </section>
               )}
 
-              {/* Unpinned section — masonry columns */}
+              {/* Unpinned section */}
               {unpinnedNotes.length > 0 && (
                 <div
                   className={
@@ -216,6 +237,9 @@ export default function Index() {
               )}
             </div>
           )}
+
+          {/* Trash — always at the bottom, collapsed by default */}
+          <TrashSection trashedNotes={trashedNotes} />
         </div>
       </div>
     </>
