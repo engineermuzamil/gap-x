@@ -19,6 +19,21 @@ export default class AuthUserSeeder extends BaseSeeder {
         fullName: 'Notes 2',
         password: 'notes123',
       },
+      {
+        email: 'todos@gap.com',
+        fullName: 'Todos User',
+        password: 'todos123',
+      },
+      {
+        email: 'todos1@gap.com',
+        fullName: 'Todos 1',
+        password: 'todos123',
+      },
+      {
+        email: 'todos2@gap.com',
+        fullName: 'Todos 2',
+        password: 'todos123',
+      },
     ]
 
     for (const userData of users) {

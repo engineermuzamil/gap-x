@@ -32,6 +32,7 @@ export type SortOption = 'pinned' | 'created_desc' | 'created_asc' | 'updated_de
 
 export interface Todo {
   id: number
+  userId: number
   title: string
   description: string | null
   isCompleted: boolean

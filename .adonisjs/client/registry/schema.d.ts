@@ -79,6 +79,66 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/session_controller').default['destroy']>>>
     }
   }
+  'todoAuth.signupPage': {
+    methods: ["GET","HEAD"]
+    pattern: '/todo-auth/signup'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'todoAuth.loginPage': {
+    methods: ["GET","HEAD"]
+    pattern: '/todo-auth/login'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'todoAuth.signup': {
+    methods: ["POST"]
+    pattern: '/todo-auth/signup'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/todo_auths_controller').default['signup']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/todo_auths_controller').default['signup']>>>
+    }
+  }
+  'todoAuth.login': {
+    methods: ["POST"]
+    pattern: '/todo-auth/login'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/todo_auths_controller').default['login']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/todo_auths_controller').default['login']>>>
+    }
+  }
+  'todoAuth.logout': {
+    methods: ["POST"]
+    pattern: '/todo-auth/logout'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/todo_auths_controller').default['logout']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/todo_auths_controller').default['logout']>>>
+    }
+  }
   'notes.showShared': {
     methods: ["GET","HEAD"]
     pattern: '/notes/share/:token'
@@ -199,9 +259,21 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['unshare']>>>
     }
   }
-  'todos.index': {
+  'todos.page': {
     methods: ["GET","HEAD"]
     pattern: '/todos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'todos.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/todos/data'
     types: {
       body: {}
       paramsTuple: []

@@ -8,5 +8,6 @@ export const controllers = {
   Notes: () => import('#controllers/notes_controller'),
   Projects: () => import('#controllers/projects_controller'),
   Session: () => import('#controllers/session_controller'),
+  TodoAuths: () => import('#controllers/todo_auths_controller'),
   Todos: () => import('#controllers/todos_controller'),
 }

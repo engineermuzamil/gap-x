@@ -42,6 +42,36 @@ const routes = {
     tokens: [{"old":"/logout","type":0,"val":"logout","end":""}],
     types: placeholder as Registry['session.destroy']['types'],
   },
+  'todoAuth.signupPage': {
+    methods: ["GET","HEAD"],
+    pattern: '/todo-auth/signup',
+    tokens: [{"old":"/todo-auth/signup","type":0,"val":"todo-auth","end":""},{"old":"/todo-auth/signup","type":0,"val":"signup","end":""}],
+    types: placeholder as Registry['todoAuth.signupPage']['types'],
+  },
+  'todoAuth.loginPage': {
+    methods: ["GET","HEAD"],
+    pattern: '/todo-auth/login',
+    tokens: [{"old":"/todo-auth/login","type":0,"val":"todo-auth","end":""},{"old":"/todo-auth/login","type":0,"val":"login","end":""}],
+    types: placeholder as Registry['todoAuth.loginPage']['types'],
+  },
+  'todoAuth.signup': {
+    methods: ["POST"],
+    pattern: '/todo-auth/signup',
+    tokens: [{"old":"/todo-auth/signup","type":0,"val":"todo-auth","end":""},{"old":"/todo-auth/signup","type":0,"val":"signup","end":""}],
+    types: placeholder as Registry['todoAuth.signup']['types'],
+  },
+  'todoAuth.login': {
+    methods: ["POST"],
+    pattern: '/todo-auth/login',
+    tokens: [{"old":"/todo-auth/login","type":0,"val":"todo-auth","end":""},{"old":"/todo-auth/login","type":0,"val":"login","end":""}],
+    types: placeholder as Registry['todoAuth.login']['types'],
+  },
+  'todoAuth.logout': {
+    methods: ["POST"],
+    pattern: '/todo-auth/logout',
+    tokens: [{"old":"/todo-auth/logout","type":0,"val":"todo-auth","end":""},{"old":"/todo-auth/logout","type":0,"val":"logout","end":""}],
+    types: placeholder as Registry['todoAuth.logout']['types'],
+  },
   'notes.showShared': {
     methods: ["GET","HEAD"],
     pattern: '/notes/share/:token',
@@ -102,10 +132,16 @@ const routes = {
     tokens: [{"old":"/notes/:id/share","type":0,"val":"notes","end":""},{"old":"/notes/:id/share","type":1,"val":"id","end":""},{"old":"/notes/:id/share","type":0,"val":"share","end":""}],
     types: placeholder as Registry['notes.unshare']['types'],
   },
-  'todos.index': {
+  'todos.page': {
     methods: ["GET","HEAD"],
     pattern: '/todos',
     tokens: [{"old":"/todos","type":0,"val":"todos","end":""}],
+    types: placeholder as Registry['todos.page']['types'],
+  },
+  'todos.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/todos/data',
+    tokens: [{"old":"/todos/data","type":0,"val":"todos","end":""},{"old":"/todos/data","type":0,"val":"data","end":""}],
     types: placeholder as Registry['todos.index']['types'],
   },
   'todos.store': {

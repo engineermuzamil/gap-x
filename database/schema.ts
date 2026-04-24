@@ -32,18 +32,7 @@ export class NoteLabelSchema extends BaseModel {
 }
 
 export class NoteSchema extends BaseModel {
-  static $columns = [
-    'content',
-    'createdAt',
-    'deletedAt',
-    'id',
-    'imageUrl',
-    'pinned',
-    'shareToken',
-    'title',
-    'updatedAt',
-    'userId',
-  ] as const
+  static $columns = ['content', 'createdAt', 'deletedAt', 'id', 'imageUrl', 'pinned', 'shareToken', 'title', 'updatedAt', 'userId'] as const
   $columns = NoteSchema.$columns
   @column()
   declare content: string
@@ -96,7 +85,7 @@ export class TodoLabelSchema extends BaseModel {
 }
 
 export class TodoSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'isCompleted', 'title', 'updatedAt'] as const
+  static $columns = ['createdAt', 'description', 'id', 'isCompleted', 'title', 'updatedAt', 'userId'] as const
   $columns = TodoSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -110,6 +99,8 @@ export class TodoSchema extends BaseModel {
   declare title: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+  @column()
+  declare userId: number | null
 }
 
 export class UserSchema extends BaseModel {

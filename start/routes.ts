@@ -4,6 +4,8 @@ import router from '@adonisjs/core/services/router'
 
 router.on('/').renderInertia('home', {}).as('home')
 
+// ─── Session-based Auth (Notes) ───────────────────────────────────────────────
+
 router
   .group(() => {
     router.get('signup', [controllers.NewAccount, 'create'])
@@ -19,7 +21,30 @@ router
   })
   .use(middleware.auth())
 
+// ─── JWT-based Auth (Todos) ───────────────────────────────────────────────────
+// GET routes render the React pages via Inertia.
+// POST routes are JSON API endpoints that return a token.
+
+router
+  .group(() => {
+    router.get('signup', ({ inertia }) => inertia.render('todos/signup', {})).as('signupPage')
+    router.get('login', ({ inertia }) => inertia.render('todos/login', {})).as('loginPage')
+    router.post('signup', [controllers.TodoAuths, 'signup']).as('signup')
+    router.post('login', [controllers.TodoAuths, 'login']).as('login')
+  })
+  .prefix('/todo-auth')
+  .as('todoAuth')
+
+router
+  .group(() => {
+    router.post('logout', [controllers.TodoAuths, 'logout']).as('logout')
+  })
+  .prefix('/todo-auth')
+  .as('todoAuth')
+  .use(middleware.jwtAuth())
+
 // ─── Notes ────────────────────────────────────────────────────────────────────
+
 router.get('/notes/share/:token', [controllers.Notes, 'showShared']).as('notes.showShared')
 
 router
@@ -39,9 +64,13 @@ router
   .use(middleware.auth())
 
 // ─── Todos ────────────────────────────────────────────────────────────────────
+// The page shell is public. Data endpoints are JWT protected.
+
+router.get('/todos', ({ inertia }) => inertia.render('todos/index', {})).as('todos.page')
+
 router
   .group(() => {
-    router.get('/', [controllers.Todos, 'index']).as('index')
+    router.get('/data', [controllers.Todos, 'index']).as('index')
     router.post('/', [controllers.Todos, 'store']).as('store')
     router.get('/:id', [controllers.Todos, 'show']).as('show')
     router.put('/:id', [controllers.Todos, 'update']).as('update')
@@ -49,8 +78,10 @@ router
   })
   .prefix('/todos')
   .as('todos')
+  .use(middleware.jwtAuth())
 
 // ─── Projects ─────────────────────────────────────────────────────────────────
+
 router
   .group(() => {
     router.get('/', [controllers.Projects, 'index']).as('index')
