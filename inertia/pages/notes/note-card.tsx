@@ -16,6 +16,7 @@ import {
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import markdownComponents from '../../lib/markdown-components'
+import { normalizeMarkdown } from '../../lib/normalize-markdown'
 import { getLabelColor } from '../../lib/label-colors'
 import type { Note } from '../../lib/types'
 
@@ -38,6 +39,7 @@ function getTimestamp(note: Note): string {
 export default function NoteCard({ note, viewType, onEdit, onDelete, onTogglePin }: NoteCardProps) {
   const isPinned = Boolean(note.pinned)
   const timestamp = getTimestamp(note)
+  const normalizedContent = normalizeMarkdown(note.content)
 
   const [shareToken, setShareToken] = useState<string | null>(note.shareToken ?? null)
   const [copied, setCopied] = useState(false)
@@ -65,7 +67,7 @@ export default function NoteCard({ note, viewType, onEdit, onDelete, onTogglePin
 
   const handleCopyLink = () => {
     if (!shareToken) return
-    navigator.clipboard.writeText(`${window.location.origin}/notes/share/${shareToken}`)
+    navigator.clipboard.writeText(`${window.location.origin}/notes/shared/${shareToken}`)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -117,7 +119,7 @@ export default function NoteCard({ note, viewType, onEdit, onDelete, onTogglePin
 
         <div className="text-sm text-[#E5E5EA]">
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-            {note.content}
+            {normalizedContent}
           </ReactMarkdown>
         </div>
       </div>

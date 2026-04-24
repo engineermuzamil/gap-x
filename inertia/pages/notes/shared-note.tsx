@@ -5,12 +5,14 @@ import { formatDistanceToNow } from 'date-fns'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import markdownComponents from '../../lib/markdown-components'
+import { normalizeMarkdown } from '../../lib/normalize-markdown'
 import { getLabelColor } from '../../lib/label-colors'
 import type { Note } from '../../lib/types'
 
 export default function Shared({ note }: { note: Note }) {
   const created = new Date(note.createdAt).getTime()
   const updated = note.updatedAt ? new Date(note.updatedAt).getTime() : null
+  const normalizedContent = normalizeMarkdown(note.content)
   const wasEdited = updated !== null && updated - created > 5000
   const timestamp = wasEdited
     ? `Updated ${formatDistanceToNow(updated!, { addSuffix: true })}`
@@ -88,7 +90,7 @@ export default function Shared({ note }: { note: Note }) {
 
               <div className="text-sm">
                 <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                  {note.content}
+                  {normalizedContent}
                 </ReactMarkdown>
               </div>
             </div>

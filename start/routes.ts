@@ -28,20 +28,15 @@ router
     router.post('/', [controllers.Notes, 'store']).as('store')
     router.put('/:id', [controllers.Notes, 'update']).as('update')
     router.delete('/:id', [controllers.Notes, 'destroy']).as('destroy')
-
-    // Trash actions
     router.post('/:id/restore', [controllers.Notes, 'restore']).as('restore')
     router.delete('/:id/force', [controllers.Notes, 'forceDestroy']).as('forceDestroy')
-
-    // Image upload
     router.post('/upload', [controllers.Notes, 'uploadImage']).as('upload')
-
-    // Sharing
     router.post('/:id/share', [controllers.Notes, 'share']).as('share')
     router.delete('/:id/share', [controllers.Notes, 'unshare']).as('unshare')
   })
   .prefix('/notes')
   .as('notes')
+  .use(middleware.auth())
 
 // ─── Todos ────────────────────────────────────────────────────────────────────
 router

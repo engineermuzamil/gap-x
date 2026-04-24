@@ -6,13 +6,23 @@ import Label from '#models/label'
 import { uploadToCloudinary, deleteFromCloudinary } from '#services/cloudinary_service'
 
 export default class NotesController {
-  async index({ inertia }: HttpContext) {
+  async index({ auth, inertia }: HttpContext) {
+    const user = auth.getUserOrFail()
+
     const [notes, trashedNotes, labels] = await Promise.all([
       // active notes only — exclude soft deleted
-      Note.query().whereNull('deleted_at').preload('labels').orderBy('created_at', 'desc'),
+      Note.query()
+        .where('user_id', user.id)
+        .whereNull('deleted_at')
+        .preload('labels')
+        .orderBy('created_at', 'desc'),
 
       // soft deleted notes only
-      Note.query().whereNotNull('deleted_at').preload('labels').orderBy('deleted_at', 'desc'),
+      Note.query()
+        .where('user_id', user.id)
+        .whereNotNull('deleted_at')
+        .preload('labels')
+        .orderBy('deleted_at', 'desc'),
 
       Label.all(),
     ])
@@ -50,7 +60,8 @@ export default class NotesController {
     return response.ok({ url: imageUrl })
   }
 
-  async store({ request, response, session }: HttpContext) {
+  async store({ auth, request, response, session }: HttpContext) {
+    const user = auth.getUserOrFail()
     const data = request.only(['title', 'content', 'pinned'])
     const labelIds: number[] = request.input('labelIds', [])
     const imageUrl: string | null = request.input('imageUrl', null)
@@ -62,7 +73,7 @@ export default class NotesController {
       }
     }
 
-    const note = await Note.create({ ...data, imageUrl })
+    const note = await Note.create({ ...data, imageUrl, userId: user.id })
 
     if (labelIds.length > 0) {
       await note.related('labels').attach(labelIds)
@@ -72,8 +83,13 @@ export default class NotesController {
     return response.redirect().back()
   }
 
-  async update({ params, request, response, session }: HttpContext) {
-    const note = await Note.query().whereNull('deleted_at').where('id', params.id).firstOrFail()
+  async update({ auth, params, request, response, session }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const note = await Note.query()
+      .where('user_id', user.id)
+      .whereNull('deleted_at')
+      .where('id', params.id)
+      .firstOrFail()
 
     const data = request.only(['title', 'content', 'pinned'])
     const labelIds: number[] = request.input('labelIds', [])
@@ -109,8 +125,13 @@ export default class NotesController {
   }
 
   // Soft delete — sets deleted_at, keeps the record in the database
-  async destroy({ params, response, session }: HttpContext) {
-    const note = await Note.query().whereNull('deleted_at').where('id', params.id).firstOrFail()
+  async destroy({ auth, params, response, session }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const note = await Note.query()
+      .where('user_id', user.id)
+      .whereNull('deleted_at')
+      .where('id', params.id)
+      .firstOrFail()
 
     note.deletedAt = DateTime.now()
     await note.save()
@@ -120,8 +141,13 @@ export default class NotesController {
   }
 
   // Restore — clears deleted_at, brings note back to active
-  async restore({ params, response, session }: HttpContext) {
-    const note = await Note.query().whereNotNull('deleted_at').where('id', params.id).firstOrFail()
+  async restore({ auth, params, response, session }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const note = await Note.query()
+      .where('user_id', user.id)
+      .whereNotNull('deleted_at')
+      .where('id', params.id)
+      .firstOrFail()
 
     note.deletedAt = null
     await note.save()
@@ -131,8 +157,13 @@ export default class NotesController {
   }
 
   // Permanent delete — only works on already soft-deleted notes
-  async forceDestroy({ params, response, session }: HttpContext) {
-    const note = await Note.query().whereNotNull('deleted_at').where('id', params.id).firstOrFail()
+  async forceDestroy({ auth, params, response, session }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const note = await Note.query()
+      .where('user_id', user.id)
+      .whereNotNull('deleted_at')
+      .where('id', params.id)
+      .firstOrFail()
 
     if (note.imageUrl) await deleteFromCloudinary(note.imageUrl)
     await note.delete()
@@ -141,8 +172,13 @@ export default class NotesController {
     return response.redirect().back()
   }
 
-  async share({ params, response, session }: HttpContext) {
-    const note = await Note.query().whereNull('deleted_at').where('id', params.id).firstOrFail()
+  async share({ auth, params, response, session }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const note = await Note.query()
+      .where('user_id', user.id)
+      .whereNull('deleted_at')
+      .where('id', params.id)
+      .firstOrFail()
 
     if (!note.shareToken) {
       note.shareToken = randomUUID()
@@ -153,8 +189,13 @@ export default class NotesController {
     return response.redirect().back()
   }
 
-  async unshare({ params, response, session }: HttpContext) {
-    const note = await Note.query().whereNull('deleted_at').where('id', params.id).firstOrFail()
+  async unshare({ auth, params, response, session }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const note = await Note.query()
+      .where('user_id', user.id)
+      .whereNull('deleted_at')
+      .where('id', params.id)
+      .firstOrFail()
 
     note.shareToken = null
     await note.save()

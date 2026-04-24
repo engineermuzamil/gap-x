@@ -4,18 +4,24 @@ import { usePage } from '@inertiajs/react'
 import { ReactElement, useEffect } from 'react'
 
 export default function Layout({ children }: { children: ReactElement<Data.SharedProps> }) {
-  useEffect(() => {
-    toast.dismiss()
-  }, [usePage().url])
+  const page = usePage()
+  const flash = children.props.flash
+  const isGuestAuthPage = page.url === '/login' || page.url === '/signup'
+  const shouldShowError =
+    !!flash.error && !(isGuestAuthPage && flash.error.toLowerCase().includes('unauthorized'))
 
   useEffect(() => {
-    if (children.props.flash.error) {
-      toast.error(children.props.flash.error)
+    toast.dismiss()
+  }, [page.url])
+
+  useEffect(() => {
+    if (shouldShowError) {
+      toast.error(flash.error)
     }
-    if (children.props.flash.success) {
-      toast.success(children.props.flash.success)
+    if (flash.success) {
+      toast.success(flash.success)
     }
-  })
+  }, [flash.error, flash.success, shouldShowError])
 
   return (
     <>
