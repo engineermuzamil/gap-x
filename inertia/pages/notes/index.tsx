@@ -25,6 +25,8 @@ export default function Index() {
   })
 
   const sortedNotes = sortNotes(notes, sortBy)
+  const pinnedNotes = sortedNotes.filter((note) => note.pinned)
+  const unpinnedNotes = sortedNotes.filter((note) => !note.pinned)
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -144,34 +146,75 @@ export default function Index() {
               </p>
             </motion.div>
           ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className={
-                viewType === 'grid' ? 'columns-1 md:columns-2 gap-3' : 'flex flex-col gap-3'
-              }
-            >
-              <AnimatePresence>
-                {sortedNotes.map((note, index) => (
-                  <motion.div
-                    key={note.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0, transition: { delay: index * 0.05 } }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className={viewType === 'grid' ? 'break-inside-avoid mb-3' : 'w-full'}
+            <div className="space-y-6">
+              {/* Pinned section — regular grid so cards sit side by side cleanly */}
+              {pinnedNotes.length > 0 && (
+                <section>
+                  <div className="flex items-center gap-3 mb-3">
+                    <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#98989D]">
+                      Pinned
+                    </h2>
+                    <div className="h-px flex-1 bg-[#0A84FF]/30" />
+                  </div>
+
+                  <div
+                    className={
+                      viewType === 'grid'
+                        ? 'grid grid-cols-1 md:grid-cols-2 gap-3'
+                        : 'flex flex-col gap-3'
+                    }
                   >
-                    <NoteCard
-                      note={note}
-                      viewType={viewType}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                      onTogglePin={handleTogglePin}
-                    />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </motion.div>
+                    <AnimatePresence>
+                      {pinnedNotes.map((note, index) => (
+                        <motion.div
+                          key={note.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0, transition: { delay: index * 0.05 } }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                        >
+                          <NoteCard
+                            note={note}
+                            viewType={viewType}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                            onTogglePin={handleTogglePin}
+                          />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                </section>
+              )}
+
+              {/* Unpinned section — masonry columns */}
+              {unpinnedNotes.length > 0 && (
+                <div
+                  className={
+                    viewType === 'grid' ? 'columns-1 md:columns-2 gap-3' : 'flex flex-col gap-3'
+                  }
+                >
+                  <AnimatePresence>
+                    {unpinnedNotes.map((note, index) => (
+                      <motion.div
+                        key={note.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0, transition: { delay: index * 0.05 } }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        className={viewType === 'grid' ? 'break-inside-avoid mb-3' : 'w-full'}
+                      >
+                        <NoteCard
+                          note={note}
+                          viewType={viewType}
+                          onEdit={handleEdit}
+                          onDelete={handleDelete}
+                          onTogglePin={handleTogglePin}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>

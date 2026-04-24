@@ -32,7 +32,6 @@ export default function Index() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
-
     if (editingTodo) {
       put(`/todos/${editingTodo.id}`, {
         onSuccess: () => {
@@ -126,7 +125,7 @@ export default function Index() {
                 animate={{ opacity: 1, y: 0, height: 'auto' }}
                 exit={{ opacity: 0, y: -20, height: 0 }}
                 transition={{ duration: 0.3 }}
-                className="overflow-hidden mb-8"
+                className="overflow-hidden mb-6"
               >
                 <TodoForm
                   data={data}
@@ -140,7 +139,18 @@ export default function Index() {
             )}
           </AnimatePresence>
 
-          {todos.length ? (
+          {!todos.length ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="rounded-2xl border border-dashed border-[#3A3A3C] bg-[#232325] px-6 py-12 text-center"
+            >
+              <h2 className="text-xl font-semibold">No todos yet</h2>
+              <p className="mt-2 text-sm text-[#98989D]">
+                Hit the + button to add your first todo.
+              </p>
+            </motion.div>
+          ) : (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -168,18 +178,6 @@ export default function Index() {
                   </motion.div>
                 ))}
               </AnimatePresence>
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="rounded-2xl border border-dashed border-[#3A3A3C] bg-[#232325] px-6 py-12 text-center"
-            >
-              <h2 className="text-xl font-semibold">No todos yet</h2>
-              <p className="mt-2 text-sm text-[#98989D]">
-                Hit the + button to add your first todo.
-              </p>
             </motion.div>
           )}
         </div>
