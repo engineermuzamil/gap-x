@@ -1,10 +1,17 @@
 export type SortOption = 'pinned' | 'created_desc' | 'created_asc' | 'updated_desc' | 'updated_asc'
 
+// Shared Label type used across notes and todos
+export interface Label {
+  id: number
+  name: string
+}
+
 export interface Note {
   id: number
   title: string
   content: string
   pinned: boolean
+  labels: Label[]
   createdAt: string
   updatedAt: string | null
 }

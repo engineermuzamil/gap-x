@@ -7,6 +7,30 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class LabelSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'name', 'updatedAt'] as const
+  $columns = LabelSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare name: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
+export class NoteLabelSchema extends BaseModel {
+  static $columns = ['id', 'labelId', 'noteId'] as const
+  $columns = NoteLabelSchema.$columns
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare labelId: number | null
+  @column()
+  declare noteId: number | null
+}
+
 export class NoteSchema extends BaseModel {
   static $columns = ['content', 'createdAt', 'id', 'pinned', 'title', 'updatedAt'] as const
   $columns = NoteSchema.$columns
@@ -39,6 +63,17 @@ export class ProjectSchema extends BaseModel {
   declare title: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
+}
+
+export class TodoLabelSchema extends BaseModel {
+  static $columns = ['id', 'labelId', 'todoId'] as const
+  $columns = TodoLabelSchema.$columns
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare labelId: number | null
+  @column()
+  declare todoId: number | null
 }
 
 export class TodoSchema extends BaseModel {

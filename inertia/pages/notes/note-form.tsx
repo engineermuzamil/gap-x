@@ -4,18 +4,22 @@ import { motion } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import markdownComponents from '../../lib/markdown-components'
+import LabelPicker from '../../lib/label-picker'
+import type { Label } from '../../lib/sort-notes'
 
 interface NoteFormProps {
   data: {
     title: string
     content: string
     pinned: boolean
+    labelIds: number[]
   }
   setData: (field: string, value: any) => void
   submit: (e: React.FormEvent) => void
   processing: boolean
   handleKeyDown: (e: React.KeyboardEvent) => void
   isEditing: boolean
+  allLabels: Label[]
 }
 
 const MARKDOWN_PLACEHOLDER = `Write your note here... Markdown is supported.
@@ -39,6 +43,7 @@ export default function NoteForm({
   processing,
   handleKeyDown,
   isEditing,
+  allLabels,
 }: NoteFormProps) {
   const [preview, setPreview] = useState(false)
 
@@ -112,7 +117,15 @@ export default function NoteForm({
           )}
         </div>
 
-        <div className="mb-4 flex items-center gap-3">
+        {/* Label picker */}
+        <LabelPicker
+          allLabels={allLabels}
+          selectedIds={data.labelIds}
+          onChange={(ids) => setData('labelIds', ids)}
+        />
+
+        {/* Pin toggle */}
+        <div className="mb-4">
           <button
             type="button"
             onClick={() => setData('pinned', !data.pinned)}

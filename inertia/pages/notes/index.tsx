@@ -6,12 +6,13 @@ import NoteCard from './note-card'
 import NoteForm from './note-form'
 import ViewSwitcher from './view-switcher'
 import SortSelector from './sort-selector'
-import { sortNotes, type SortOption, type Note } from '../../lib/sort-notes'
+import { sortNotes, type SortOption, type Note, type Label } from '../../lib/sort-notes'
 
 type ViewType = 'grid' | 'list'
 
 export default function Index() {
-  const { notes } = usePage<{ notes: Note[] }>().props
+  // labels comes from the controller alongside notes
+  const { notes, labels } = usePage<{ notes: Note[]; labels: Label[] }>().props
 
   const [isFormVisible, setIsFormVisible] = useState(false)
   const [editingNote, setEditingNote] = useState<Note | null>(null)
@@ -22,6 +23,7 @@ export default function Index() {
     title: '',
     content: '',
     pinned: false,
+    labelIds: [] as number[], // tracks which labels are selected
   })
 
   const sortedNotes = sortNotes(notes, sortBy)
@@ -50,7 +52,13 @@ export default function Index() {
 
   const handleEdit = (note: Note) => {
     setEditingNote(note)
-    setData({ title: note.title, content: note.content, pinned: note.pinned })
+    setData({
+      title: note.title,
+      content: note.content,
+      pinned: note.pinned,
+      // Pre-fill the picker with the note's current label IDs
+      labelIds: note.labels.map((l) => l.id),
+    })
     setIsFormVisible(true)
   }
 
@@ -63,6 +71,8 @@ export default function Index() {
       title: note.title,
       content: note.content,
       pinned: !note.pinned,
+      // Keep existing labels unchanged during a pin toggle
+      labelIds: note.labels.map((l) => l.id),
     })
   }
 
@@ -129,6 +139,7 @@ export default function Index() {
                   processing={processing}
                   handleKeyDown={handleKeyDown}
                   isEditing={!!editingNote}
+                  allLabels={labels}
                 />
               </motion.div>
             )}
@@ -147,7 +158,6 @@ export default function Index() {
             </motion.div>
           ) : (
             <div className="space-y-6">
-              {/* Pinned section — regular grid so cards sit side by side cleanly */}
               {pinnedNotes.length > 0 && (
                 <section>
                   <div className="flex items-center gap-3 mb-3">
@@ -156,7 +166,6 @@ export default function Index() {
                     </h2>
                     <div className="h-px flex-1 bg-[#0A84FF]/30" />
                   </div>
-
                   <div
                     className={
                       viewType === 'grid'
@@ -186,7 +195,6 @@ export default function Index() {
                 </section>
               )}
 
-              {/* Unpinned section — masonry columns */}
               {unpinnedNotes.length > 0 && (
                 <div
                   className={

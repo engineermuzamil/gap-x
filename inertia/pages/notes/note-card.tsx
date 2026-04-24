@@ -4,6 +4,7 @@ import { PencilIcon, Trash2, Pin, PinOff } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import markdownComponents from '../../lib/markdown-components'
+import { getLabelColor } from '../../lib/label-colors'
 import type { Note } from '../../lib/sort-notes'
 
 interface NoteCardProps {
@@ -42,6 +43,7 @@ export default function NoteCard({ note, viewType, onEdit, onDelete, onTogglePin
 
       <div className={`p-5 ${viewType === 'list' ? 'flex items-start gap-4' : ''}`}>
         <div className={viewType === 'list' ? 'flex-1' : ''}>
+          {/* Title row + action buttons */}
           <div className="flex justify-between items-start mb-3">
             <h2 className="text-lg font-medium text-white">{note.title}</h2>
 
@@ -81,7 +83,21 @@ export default function NoteCard({ note, viewType, onEdit, onDelete, onTogglePin
             </div>
           </div>
 
-          {/* Markdown rendered content */}
+          {/* Label chips — only render if the note has labels */}
+          {note.labels.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {note.labels.map((label) => {
+                const { bg, text } = getLabelColor(label.name)
+                return (
+                  <span key={label.id} className={`text-xs px-2 py-0.5 rounded-full ${bg} ${text}`}>
+                    {label.name}
+                  </span>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Markdown content */}
           <div className="text-sm">
             <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
               {note.content}
