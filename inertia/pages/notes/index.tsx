@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { PlusIcon, XIcon, ArrowLeft } from 'lucide-react'
 import NoteCard from './note-card'
+import FlashToast from './flash-toast'
 import NoteForm from './note-form'
 import ViewSwitcher from './view-switcher'
 import SortSelector from './sort-selector'
@@ -76,6 +77,7 @@ export default function Index() {
       labelIds: note.labels.map((l) => l.id),
       imageUrl: null,
       removeImage: false,
+      pinToggle: true,
     })
   }
 
@@ -96,6 +98,7 @@ export default function Index() {
   return (
     <>
       <Head title="Notes" />
+      <FlashToast />
       <div className="min-h-screen bg-[#1C1C1E] text-white">
         <div className="max-w-4xl mx-auto p-6">
           <motion.div

@@ -19,6 +19,9 @@ export default class Note extends BaseModel {
   @column()
   declare imageUrl: string | null
 
+  @column()
+  declare shareToken: string | null
+
   @manyToMany(() => Label, {
     pivotTable: 'note_labels',
   })

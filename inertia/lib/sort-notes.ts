@@ -12,6 +12,7 @@ export interface Note {
   content: string
   pinned: boolean
   imageUrl: string | null
+  shareToken: string | null
   labels: Label[]
   createdAt: string
   updatedAt: string | null

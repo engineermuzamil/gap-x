@@ -79,6 +79,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/session_controller').default['destroy']>>>
     }
   }
+  'notes.showShared': {
+    methods: ["GET","HEAD"]
+    pattern: '/notes/share/:token'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['showShared']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['showShared']>>>
+    }
+  }
   'notes.index': {
     methods: ["GET","HEAD"]
     pattern: '/notes'
@@ -139,6 +151,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['uploadImage']>>>
     }
   }
+  'notes.share': {
+    methods: ["POST"]
+    pattern: '/notes/:id/share'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['share']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['share']>>>
+    }
+  }
+  'notes.unshare': {
+    methods: ["DELETE"]
+    pattern: '/notes/:id/share'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['unshare']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['unshare']>>>
+    }
+  }
   'todos.index': {
     methods: ["GET","HEAD"]
     pattern: '/todos'
@@ -161,6 +197,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/todos_controller').default['store']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/todos_controller').default['store']>>>
+    }
+  }
+  'todos.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/todos/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/todos_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/todos_controller').default['show']>>>
     }
   }
   'todos.update': {

@@ -13,15 +13,19 @@ export interface ApiDefinition {
     destroy: typeof routes['session.destroy']
   }
   notes: {
+    showShared: typeof routes['notes.showShared']
     index: typeof routes['notes.index']
     store: typeof routes['notes.store']
     update: typeof routes['notes.update']
     destroy: typeof routes['notes.destroy']
     upload: typeof routes['notes.upload']
+    share: typeof routes['notes.share']
+    unshare: typeof routes['notes.unshare']
   }
   todos: {
     index: typeof routes['todos.index']
     store: typeof routes['todos.store']
+    show: typeof routes['todos.show']
     update: typeof routes['todos.update']
     destroy: typeof routes['todos.destroy']
   }
