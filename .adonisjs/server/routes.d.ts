@@ -15,6 +15,8 @@ export type ScannedRoutes = {
     'notes.store': { paramsTuple?: []; params?: {} }
     'notes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'notes.restore': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'notes.forceDestroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notes.upload': { paramsTuple?: []; params?: {} }
     'notes.share': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notes.unshare': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -53,6 +55,7 @@ export type ScannedRoutes = {
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
     'notes.store': { paramsTuple?: []; params?: {} }
+    'notes.restore': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notes.upload': { paramsTuple?: []; params?: {} }
     'notes.share': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.store': { paramsTuple?: []; params?: {} }
@@ -65,6 +68,7 @@ export type ScannedRoutes = {
   }
   DELETE: {
     'notes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'notes.forceDestroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notes.unshare': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'projects.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

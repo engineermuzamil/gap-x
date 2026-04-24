@@ -18,6 +18,8 @@ export interface ApiDefinition {
     store: typeof routes['notes.store']
     update: typeof routes['notes.update']
     destroy: typeof routes['notes.destroy']
+    restore: typeof routes['notes.restore']
+    forceDestroy: typeof routes['notes.forceDestroy']
     upload: typeof routes['notes.upload']
     share: typeof routes['notes.share']
     unshare: typeof routes['notes.unshare']

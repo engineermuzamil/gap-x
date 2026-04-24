@@ -72,6 +72,18 @@ const routes = {
     tokens: [{"old":"/notes/:id","type":0,"val":"notes","end":""},{"old":"/notes/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['notes.destroy']['types'],
   },
+  'notes.restore': {
+    methods: ["POST"],
+    pattern: '/notes/:id/restore',
+    tokens: [{"old":"/notes/:id/restore","type":0,"val":"notes","end":""},{"old":"/notes/:id/restore","type":1,"val":"id","end":""},{"old":"/notes/:id/restore","type":0,"val":"restore","end":""}],
+    types: placeholder as Registry['notes.restore']['types'],
+  },
+  'notes.forceDestroy': {
+    methods: ["DELETE"],
+    pattern: '/notes/:id/force',
+    tokens: [{"old":"/notes/:id/force","type":0,"val":"notes","end":""},{"old":"/notes/:id/force","type":1,"val":"id","end":""},{"old":"/notes/:id/force","type":0,"val":"force","end":""}],
+    types: placeholder as Registry['notes.forceDestroy']['types'],
+  },
   'notes.upload': {
     methods: ["POST"],
     pattern: '/notes/upload',

@@ -2,17 +2,7 @@ import { motion } from 'framer-motion'
 import { formatDistanceToNow } from 'date-fns'
 import { CheckCircle2, Circle, PencilIcon, Trash2 } from 'lucide-react'
 import { getLabelColor } from '../../lib/label-colors'
-import type { Label } from '../../lib/sort-notes'
-
-interface Todo {
-  id: number
-  title: string
-  description: string | null
-  isCompleted: boolean
-  labels: Label[]
-  createdAt: string
-  updatedAt: string | null
-}
+import type { Todo } from '../../lib/types'
 
 interface TodoCardProps {
   todo: Todo

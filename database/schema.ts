@@ -32,12 +32,14 @@ export class NoteLabelSchema extends BaseModel {
 }
 
 export class NoteSchema extends BaseModel {
-  static $columns = ['content', 'createdAt', 'id', 'imageUrl', 'pinned', 'shareToken', 'title', 'updatedAt'] as const
+  static $columns = ['content', 'createdAt', 'deletedAt', 'id', 'imageUrl', 'pinned', 'shareToken', 'title', 'updatedAt'] as const
   $columns = NoteSchema.$columns
   @column()
   declare content: string
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column.dateTime()
+  declare deletedAt: DateTime | null
   @column({ isPrimary: true })
   declare id: number
   @column()

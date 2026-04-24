@@ -139,6 +139,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['destroy']>>>
     }
   }
+  'notes.restore': {
+    methods: ["POST"]
+    pattern: '/notes/:id/restore'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['restore']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['restore']>>>
+    }
+  }
+  'notes.forceDestroy': {
+    methods: ["DELETE"]
+    pattern: '/notes/:id/force'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['forceDestroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['forceDestroy']>>>
+    }
+  }
   'notes.upload': {
     methods: ["POST"]
     pattern: '/notes/upload'

@@ -17,7 +17,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import markdownComponents from '../../lib/markdown-components'
 import { getLabelColor } from '../../lib/label-colors'
-import type { Note } from '../../lib/sort-notes'
+import type { Note } from '../../lib/types'
 
 interface NoteCardProps {
   note: Note

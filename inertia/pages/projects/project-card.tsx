@@ -1,15 +1,7 @@
 import { motion } from 'framer-motion'
 import { formatDistanceToNow } from 'date-fns'
 import { PencilIcon, Trash2 } from 'lucide-react'
-
-interface Project {
-  id: number
-  title: string
-  description: string
-  status: 'pending' | 'in-progress' | 'completed'
-  createdAt: string
-  updatedAt: string
-}
+import type { Project, ProjectStatus } from '../../lib/types'
 
 interface ProjectCardProps {
   project: Project
@@ -18,13 +10,13 @@ interface ProjectCardProps {
   onDelete: (id: number) => void
 }
 
-const statusStyles = {
+const statusStyles: Record<ProjectStatus, string> = {
   'pending': 'bg-amber-500/15 text-amber-300 border border-amber-500/30',
   'in-progress': 'bg-blue-500/15 text-blue-300 border border-blue-500/30',
   'completed': 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30',
 }
 
-const statusLabels = {
+const statusLabels: Record<ProjectStatus, string> = {
   'pending': 'Pending',
   'in-progress': 'In Progress',
   'completed': 'Completed',

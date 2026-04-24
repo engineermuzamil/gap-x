@@ -1,4 +1,5 @@
 import { HttpContext } from '@adonisjs/core/http'
+import { DateTime } from 'luxon'
 import { randomUUID } from 'node:crypto'
 import Note from '#models/note'
 import Label from '#models/label'
@@ -6,17 +7,26 @@ import { uploadToCloudinary, deleteFromCloudinary } from '#services/cloudinary_s
 
 export default class NotesController {
   async index({ inertia }: HttpContext) {
-    const [notes, labels] = await Promise.all([
-      Note.query().preload('labels').orderBy('created_at', 'desc'),
+    const [notes, trashedNotes, labels] = await Promise.all([
+      // active notes only — exclude soft deleted
+      Note.query().whereNull('deleted_at').preload('labels').orderBy('created_at', 'desc'),
+
+      // soft deleted notes only
+      Note.query().whereNotNull('deleted_at').preload('labels').orderBy('deleted_at', 'desc'),
+
       Label.all(),
     ])
 
-    const serialized = notes.map((note) => ({
+    const serialize = (note: Note) => ({
       ...note.serialize(),
       pinned: Boolean(note.pinned),
-    }))
+    })
 
-    return inertia.render('notes/index', { notes: serialized, labels } as never)
+    return inertia.render('notes/index', {
+      notes: notes.map(serialize),
+      trashedNotes: trashedNotes.map(serialize),
+      labels,
+    } as never)
   }
 
   async uploadImage({ request, response }: HttpContext) {
@@ -53,6 +63,7 @@ export default class NotesController {
     }
 
     const note = await Note.create({ ...data, imageUrl })
+
     if (labelIds.length > 0) {
       await note.related('labels').attach(labelIds)
     }
@@ -62,10 +73,7 @@ export default class NotesController {
   }
 
   async update({ params, request, response, session }: HttpContext) {
-    const note = await Note.find(params.id)
-    if (!note) {
-      return response.notFound({ error: `Note with ID ${params.id} not found` })
-    }
+    const note = await Note.query().whereNull('deleted_at').where('id', params.id).firstOrFail()
 
     const data = request.only(['title', 'content', 'pinned'])
     const labelIds: number[] = request.input('labelIds', [])
@@ -92,33 +100,49 @@ export default class NotesController {
 
     await note.related('labels').sync(labelIds)
 
-    if (pinToggle) {
-      session.flash('success', data.pinned ? 'Note pinned' : 'Note unpinned')
-    } else {
-      session.flash('success', 'Note updated')
-    }
+    session.flash(
+      'success',
+      pinToggle ? (data.pinned ? 'Note pinned' : 'Note unpinned') : 'Note updated'
+    )
 
     return response.redirect().back()
   }
 
+  // Soft delete — sets deleted_at, keeps the record in the database
   async destroy({ params, response, session }: HttpContext) {
-    const note = await Note.find(params.id)
-    if (!note) {
-      return response.notFound({ error: `Note with ID ${params.id} not found` })
-    }
+    const note = await Note.query().whereNull('deleted_at').where('id', params.id).firstOrFail()
+
+    note.deletedAt = DateTime.now()
+    await note.save()
+
+    session.flash('success', 'Note moved to trash')
+    return response.redirect().back()
+  }
+
+  // Restore — clears deleted_at, brings note back to active
+  async restore({ params, response, session }: HttpContext) {
+    const note = await Note.query().whereNotNull('deleted_at').where('id', params.id).firstOrFail()
+
+    note.deletedAt = null
+    await note.save()
+
+    session.flash('success', 'Note restored')
+    return response.redirect().back()
+  }
+
+  // Permanent delete — only works on already soft-deleted notes
+  async forceDestroy({ params, response, session }: HttpContext) {
+    const note = await Note.query().whereNotNull('deleted_at').where('id', params.id).firstOrFail()
 
     if (note.imageUrl) await deleteFromCloudinary(note.imageUrl)
     await note.delete()
 
-    session.flash('success', 'Note deleted')
+    session.flash('success', 'Note permanently deleted')
     return response.redirect().back()
   }
 
   async share({ params, response, session }: HttpContext) {
-    const note = await Note.find(params.id)
-    if (!note) {
-      return response.notFound({ error: `Note with ID ${params.id} not found` })
-    }
+    const note = await Note.query().whereNull('deleted_at').where('id', params.id).firstOrFail()
 
     if (!note.shareToken) {
       note.shareToken = randomUUID()
@@ -130,10 +154,7 @@ export default class NotesController {
   }
 
   async unshare({ params, response, session }: HttpContext) {
-    const note = await Note.find(params.id)
-    if (!note) {
-      return response.notFound({ error: `Note with ID ${params.id} not found` })
-    }
+    const note = await Note.query().whereNull('deleted_at').where('id', params.id).firstOrFail()
 
     note.shareToken = null
     await note.save()
@@ -143,7 +164,11 @@ export default class NotesController {
   }
 
   async showShared({ params, inertia, response }: HttpContext) {
-    const note = await Note.query().where('share_token', params.token).preload('labels').first()
+    const note = await Note.query()
+      .whereNull('deleted_at')
+      .where('share_token', params.token)
+      .preload('labels')
+      .first()
 
     if (!note) {
       return response.notFound({ error: 'This shared note does not exist or the link has expired' })

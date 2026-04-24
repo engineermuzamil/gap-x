@@ -3,16 +3,21 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { PlusIcon, XIcon, ArrowLeft } from 'lucide-react'
 import NoteCard from './note-card'
-import FlashToast from './flash-toast'
 import NoteForm from './note-form'
 import ViewSwitcher from './view-switcher'
 import SortSelector from './sort-selector'
-import { sortNotes, type SortOption, type Note, type Label } from '../../lib/sort-notes'
+import TrashSection from './trash-section'
+import { sortNotes } from '../../lib/sort-notes'
+import type { SortOption, Note, Label } from '../../lib/types'
 
 type ViewType = 'grid' | 'list'
 
 export default function Index() {
-  const { notes, labels } = usePage<{ notes: Note[]; labels: Label[] }>().props
+  const { notes, trashedNotes, labels } = usePage<{
+    notes: Note[]
+    trashedNotes: Note[]
+    labels: Label[]
+  }>().props
 
   const [isFormVisible, setIsFormVisible] = useState(false)
   const [editingNote, setEditingNote] = useState<Note | null>(null)
@@ -98,7 +103,6 @@ export default function Index() {
   return (
     <>
       <Head title="Notes" />
-      <FlashToast />
       <div className="min-h-screen bg-[#1C1C1E] text-white">
         <div className="max-w-4xl mx-auto p-6">
           <motion.div
@@ -165,6 +169,7 @@ export default function Index() {
             </motion.div>
           ) : (
             <div className="space-y-6">
+              {/* Pinned section */}
               {pinnedNotes.length > 0 && (
                 <section>
                   <div className="flex items-center gap-3 mb-3">
@@ -202,6 +207,7 @@ export default function Index() {
                 </section>
               )}
 
+              {/* Unpinned section */}
               {unpinnedNotes.length > 0 && (
                 <div
                   className={
@@ -231,6 +237,9 @@ export default function Index() {
               )}
             </div>
           )}
+
+          {/* Trash — always at the bottom, collapsed by default */}
+          <TrashSection trashedNotes={trashedNotes} />
         </div>
       </div>
     </>

@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import markdownComponents from '../../lib/markdown-components'
 import LabelPicker from '../../lib/label-picker'
-import type { Label } from '../../lib/sort-notes'
+import type { Label } from '../../lib/types'
 import { ImageIcon, XCircleIcon, UploadIcon, Loader2Icon } from 'lucide-react'
 
 interface NoteFormProps {

@@ -1,12 +1,9 @@
-// start/routes.ts
 import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
 import router from '@adonisjs/core/services/router'
 
-// Homepage
 router.on('/').renderInertia('home', {}).as('home')
 
-// Authentication
 router
   .group(() => {
     router.get('signup', [controllers.NewAccount, 'create'])
@@ -23,9 +20,6 @@ router
   .use(middleware.auth())
 
 // ─── Notes ────────────────────────────────────────────────────────────────────
-
-// PUBLIC — no auth required. Must be OUTSIDE the auth group.
-// Anyone with the UUID link can view a shared note, even without an account.
 router.get('/notes/share/:token', [controllers.Notes, 'showShared']).as('notes.showShared')
 
 router
@@ -35,10 +29,14 @@ router
     router.put('/:id', [controllers.Notes, 'update']).as('update')
     router.delete('/:id', [controllers.Notes, 'destroy']).as('destroy')
 
+    // Trash actions
+    router.post('/:id/restore', [controllers.Notes, 'restore']).as('restore')
+    router.delete('/:id/force', [controllers.Notes, 'forceDestroy']).as('forceDestroy')
+
     // Image upload
     router.post('/upload', [controllers.Notes, 'uploadImage']).as('upload')
 
-    // Sharing — POST generates the token, DELETE revokes it
+    // Sharing
     router.post('/:id/share', [controllers.Notes, 'share']).as('share')
     router.delete('/:id/share', [controllers.Notes, 'unshare']).as('unshare')
   })

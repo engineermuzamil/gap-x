@@ -1,11 +1,12 @@
 import type React from 'react'
 import { motion } from 'framer-motion'
+import type { ProjectStatus } from '../../lib/types'
 
 interface ProjectFormProps {
   data: {
     title: string
     description: string
-    status: 'pending' | 'in-progress' | 'completed'
+    status: ProjectStatus
   }
   setData: (field: string, value: string) => void
   submit: (e: React.FormEvent) => void

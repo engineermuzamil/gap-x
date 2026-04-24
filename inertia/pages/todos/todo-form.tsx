@@ -1,7 +1,7 @@
 import type React from 'react'
 import { motion } from 'framer-motion'
 import LabelPicker from '../../lib/label-picker'
-import type { Label } from '../../lib/sort-notes'
+import type { Label } from '../../lib/types'
 
 interface TodoFormProps {
   data: {

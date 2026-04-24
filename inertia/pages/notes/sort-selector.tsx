@@ -1,5 +1,5 @@
 // import { ArrowUpDown } from 'lucide-react'
-// import type { SortOption } from '../../lib/sort-notes'
+// import type { SortOption } from '../../lib/types'
 
 // interface SortSelectorProps {
 //   value: SortOption
@@ -35,7 +35,7 @@
 // }
 
 import { ArrowUpDown } from 'lucide-react'
-import type { SortOption } from '../../lib/sort-notes'
+import type { SortOption } from '../../lib/types'
 
 interface SortSelectorProps {
   value: SortOption

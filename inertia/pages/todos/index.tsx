@@ -5,17 +5,7 @@ import { PlusIcon, XIcon, ArrowLeft } from 'lucide-react'
 import TodoCard from './todo-card'
 import TodoForm from './todo-form'
 import ViewSwitcher from '../notes/view-switcher'
-import type { Label } from '../../lib/sort-notes'
-
-interface Todo {
-  id: number
-  title: string
-  description: string | null
-  isCompleted: boolean
-  labels: Label[]
-  createdAt: string
-  updatedAt: string | null
-}
+import type { Todo, Label } from '../../lib/types'
 
 type ViewType = 'grid' | 'list'
 
