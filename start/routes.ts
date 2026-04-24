@@ -29,6 +29,8 @@ router
     router.post('/', [controllers.Notes, 'store']).as('store')
     router.put('/:id', [controllers.Notes, 'update']).as('update')
     router.delete('/:id', [controllers.Notes, 'destroy']).as('destroy')
+
+    router.post('/upload', [controllers.Notes, 'uploadImage']).as('upload')
   })
   .prefix('/notes')
   .as('notes')

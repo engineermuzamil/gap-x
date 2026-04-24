@@ -32,7 +32,7 @@ export class NoteLabelSchema extends BaseModel {
 }
 
 export class NoteSchema extends BaseModel {
-  static $columns = ['content', 'createdAt', 'id', 'pinned', 'title', 'updatedAt'] as const
+  static $columns = ['content', 'createdAt', 'id', 'imageUrl', 'pinned', 'title', 'updatedAt'] as const
   $columns = NoteSchema.$columns
   @column()
   declare content: string
@@ -40,6 +40,8 @@ export class NoteSchema extends BaseModel {
   declare createdAt: DateTime
   @column({ isPrimary: true })
   declare id: number
+  @column()
+  declare imageUrl: string | null
   @column()
   declare pinned: boolean
   @column()

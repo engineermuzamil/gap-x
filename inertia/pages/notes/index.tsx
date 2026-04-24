@@ -11,7 +11,6 @@ import { sortNotes, type SortOption, type Note, type Label } from '../../lib/sor
 type ViewType = 'grid' | 'list'
 
 export default function Index() {
-  // labels comes from the controller alongside notes
   const { notes, labels } = usePage<{ notes: Note[]; labels: Label[] }>().props
 
   const [isFormVisible, setIsFormVisible] = useState(false)
@@ -23,12 +22,14 @@ export default function Index() {
     title: '',
     content: '',
     pinned: false,
-    labelIds: [] as number[], // tracks which labels are selected
+    labelIds: [] as number[],
+    imageUrl: null as string | null,
+    removeImage: false,
   })
 
   const sortedNotes = sortNotes(notes, sortBy)
-  const pinnedNotes = sortedNotes.filter((note) => note.pinned)
-  const unpinnedNotes = sortedNotes.filter((note) => !note.pinned)
+  const pinnedNotes = sortedNotes.filter((n) => n.pinned)
+  const unpinnedNotes = sortedNotes.filter((n) => !n.pinned)
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -56,8 +57,9 @@ export default function Index() {
       title: note.title,
       content: note.content,
       pinned: note.pinned,
-      // Pre-fill the picker with the note's current label IDs
       labelIds: note.labels.map((l) => l.id),
+      imageUrl: null,
+      removeImage: false,
     })
     setIsFormVisible(true)
   }
@@ -71,8 +73,9 @@ export default function Index() {
       title: note.title,
       content: note.content,
       pinned: !note.pinned,
-      // Keep existing labels unchanged during a pin toggle
       labelIds: note.labels.map((l) => l.id),
+      imageUrl: null,
+      removeImage: false,
     })
   }
 
@@ -140,6 +143,7 @@ export default function Index() {
                   handleKeyDown={handleKeyDown}
                   isEditing={!!editingNote}
                   allLabels={labels}
+                  existingImageUrl={editingNote?.imageUrl ?? null}
                 />
               </motion.div>
             )}

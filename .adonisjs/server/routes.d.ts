@@ -14,6 +14,7 @@ export type ScannedRoutes = {
     'notes.store': { paramsTuple?: []; params?: {} }
     'notes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'notes.upload': { paramsTuple?: []; params?: {} }
     'todos.index': { paramsTuple?: []; params?: {} }
     'todos.store': { paramsTuple?: []; params?: {} }
     'todos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -44,6 +45,7 @@ export type ScannedRoutes = {
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
     'notes.store': { paramsTuple?: []; params?: {} }
+    'notes.upload': { paramsTuple?: []; params?: {} }
     'todos.store': { paramsTuple?: []; params?: {} }
     'projects.store': { paramsTuple?: []; params?: {} }
   }

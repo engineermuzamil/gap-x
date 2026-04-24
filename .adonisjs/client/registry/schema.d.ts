@@ -127,6 +127,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['destroy']>>>
     }
   }
+  'notes.upload': {
+    methods: ["POST"]
+    pattern: '/notes/upload'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['uploadImage']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['uploadImage']>>>
+    }
+  }
   'todos.index': {
     methods: ["GET","HEAD"]
     pattern: '/todos'

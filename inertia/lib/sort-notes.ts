@@ -11,6 +11,7 @@ export interface Note {
   title: string
   content: string
   pinned: boolean
+  imageUrl: string | null
   labels: Label[]
   createdAt: string
   updatedAt: string | null

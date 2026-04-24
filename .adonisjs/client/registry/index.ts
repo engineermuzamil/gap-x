@@ -66,6 +66,12 @@ const routes = {
     tokens: [{"old":"/notes/:id","type":0,"val":"notes","end":""},{"old":"/notes/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['notes.destroy']['types'],
   },
+  'notes.upload': {
+    methods: ["POST"],
+    pattern: '/notes/upload',
+    tokens: [{"old":"/notes/upload","type":0,"val":"notes","end":""},{"old":"/notes/upload","type":0,"val":"upload","end":""}],
+    types: placeholder as Registry['notes.upload']['types'],
+  },
   'todos.index': {
     methods: ["GET","HEAD"],
     pattern: '/todos',

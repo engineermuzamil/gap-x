@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { formatDistanceToNow } from 'date-fns'
-import { PencilIcon, Trash2, Pin, PinOff } from 'lucide-react'
+import { PencilIcon, Trash2, Pin, PinOff, ImageIcon } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import markdownComponents from '../../lib/markdown-components'
@@ -19,9 +19,7 @@ function getTimestamp(note: Note): string {
   const created = new Date(note.createdAt).getTime()
   const updated = note.updatedAt ? new Date(note.updatedAt).getTime() : null
   const wasEdited = updated !== null && updated - created > 5000
-  if (wasEdited) {
-    return `Updated ${formatDistanceToNow(updated!, { addSuffix: true })}`
-  }
+  if (wasEdited) return `Updated ${formatDistanceToNow(updated!, { addSuffix: true })}`
   return `Created ${formatDistanceToNow(created, { addSuffix: true })}`
 }
 
@@ -41,15 +39,29 @@ export default function NoteCard({ note, viewType, onEdit, onDelete, onTogglePin
     >
       {isPinned && <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#0A84FF]/60" />}
 
+      {/* Hero image — full-bleed above the card content */}
+      {note.imageUrl && (
+        <div className="relative w-full overflow-hidden">
+          <img
+            src={note.imageUrl}
+            alt={`Image for ${note.title}`}
+            className={`w-full object-cover ${viewType === 'list' ? 'max-h-32' : 'max-h-48'}`}
+            loading="lazy"
+          />
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#2C2C2E]/60 to-transparent" />
+          <span className="absolute top-2 right-2 bg-[#1C1C1E]/70 rounded-md px-1.5 py-0.5 flex items-center gap-1 text-[10px] text-[#98989D]">
+            <ImageIcon size={10} />
+            image
+          </span>
+        </div>
+      )}
+
       <div className={`p-5 ${viewType === 'list' ? 'flex items-start gap-4' : ''}`}>
         <div className={viewType === 'list' ? 'flex-1' : ''}>
-          {/* Title row + action buttons */}
           <div className="flex justify-between items-start mb-3">
             <h2 className="text-lg font-medium text-white">{note.title}</h2>
-
             <div className="flex items-center gap-1 ml-2 shrink-0">
               <span className="text-xs text-[#98989D] mr-1">{timestamp}</span>
-
               <button
                 type="button"
                 onClick={() => onTogglePin(note)}
@@ -62,7 +74,6 @@ export default function NoteCard({ note, viewType, onEdit, onDelete, onTogglePin
               >
                 {isPinned ? <PinOff size={13} /> : <Pin size={13} />}
               </button>
-
               <button
                 type="button"
                 onClick={() => onEdit(note)}
@@ -71,7 +82,6 @@ export default function NoteCard({ note, viewType, onEdit, onDelete, onTogglePin
               >
                 <PencilIcon size={13} />
               </button>
-
               <button
                 type="button"
                 onClick={() => onDelete(note.id)}
@@ -83,7 +93,6 @@ export default function NoteCard({ note, viewType, onEdit, onDelete, onTogglePin
             </div>
           </div>
 
-          {/* Label chips — only render if the note has labels */}
           {note.labels.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-3">
               {note.labels.map((label) => {
@@ -97,7 +106,6 @@ export default function NoteCard({ note, viewType, onEdit, onDelete, onTogglePin
             </div>
           )}
 
-          {/* Markdown content */}
           <div className="text-sm">
             <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
               {note.content}

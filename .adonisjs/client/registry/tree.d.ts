@@ -17,6 +17,7 @@ export interface ApiDefinition {
     store: typeof routes['notes.store']
     update: typeof routes['notes.update']
     destroy: typeof routes['notes.destroy']
+    upload: typeof routes['notes.upload']
   }
   todos: {
     index: typeof routes['todos.index']
