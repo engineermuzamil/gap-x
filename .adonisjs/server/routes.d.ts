@@ -10,6 +10,11 @@ export type ScannedRoutes = {
     'session.create': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
+    'todoAuth.signupPage': { paramsTuple?: []; params?: {} }
+    'todoAuth.loginPage': { paramsTuple?: []; params?: {} }
+    'todoAuth.signup': { paramsTuple?: []; params?: {} }
+    'todoAuth.login': { paramsTuple?: []; params?: {} }
+    'todoAuth.logout': { paramsTuple?: []; params?: {} }
     'notes.showShared': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'notes.index': { paramsTuple?: []; params?: {} }
     'notes.store': { paramsTuple?: []; params?: {} }
@@ -20,11 +25,16 @@ export type ScannedRoutes = {
     'notes.upload': { paramsTuple?: []; params?: {} }
     'notes.share': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notes.unshare': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'todos.page': { paramsTuple?: []; params?: {} }
     'todos.index': { paramsTuple?: []; params?: {} }
     'todos.store': { paramsTuple?: []; params?: {} }
     'todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'projectsAuth.page': { paramsTuple?: []; params?: {} }
+    'projectsAuth.google.redirect': { paramsTuple?: []; params?: {} }
+    'projectsAuth.google.callback': { paramsTuple?: []; params?: {} }
+    'projectsAuth.logout': { paramsTuple?: []; params?: {} }
     'projects.index': { paramsTuple?: []; params?: {} }
     'projects.store': { paramsTuple?: []; params?: {} }
     'projects.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -34,31 +44,47 @@ export type ScannedRoutes = {
     'home': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
+    'todoAuth.signupPage': { paramsTuple?: []; params?: {} }
+    'todoAuth.loginPage': { paramsTuple?: []; params?: {} }
     'notes.showShared': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'notes.index': { paramsTuple?: []; params?: {} }
+    'todos.page': { paramsTuple?: []; params?: {} }
     'todos.index': { paramsTuple?: []; params?: {} }
     'todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'projectsAuth.page': { paramsTuple?: []; params?: {} }
+    'projectsAuth.google.redirect': { paramsTuple?: []; params?: {} }
+    'projectsAuth.google.callback': { paramsTuple?: []; params?: {} }
     'projects.index': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'home': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
+    'todoAuth.signupPage': { paramsTuple?: []; params?: {} }
+    'todoAuth.loginPage': { paramsTuple?: []; params?: {} }
     'notes.showShared': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'notes.index': { paramsTuple?: []; params?: {} }
+    'todos.page': { paramsTuple?: []; params?: {} }
     'todos.index': { paramsTuple?: []; params?: {} }
     'todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'projectsAuth.page': { paramsTuple?: []; params?: {} }
+    'projectsAuth.google.redirect': { paramsTuple?: []; params?: {} }
+    'projectsAuth.google.callback': { paramsTuple?: []; params?: {} }
     'projects.index': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
+    'todoAuth.signup': { paramsTuple?: []; params?: {} }
+    'todoAuth.login': { paramsTuple?: []; params?: {} }
+    'todoAuth.logout': { paramsTuple?: []; params?: {} }
     'notes.store': { paramsTuple?: []; params?: {} }
     'notes.restore': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notes.upload': { paramsTuple?: []; params?: {} }
     'notes.share': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.store': { paramsTuple?: []; params?: {} }
+    'projectsAuth.logout': { paramsTuple?: []; params?: {} }
     'projects.store': { paramsTuple?: []; params?: {} }
   }
   PUT: {

@@ -32,7 +32,18 @@ export class NoteLabelSchema extends BaseModel {
 }
 
 export class NoteSchema extends BaseModel {
-  static $columns = ['content', 'createdAt', 'deletedAt', 'id', 'imageUrl', 'pinned', 'shareToken', 'title', 'updatedAt'] as const
+  static $columns = [
+    'content',
+    'createdAt',
+    'deletedAt',
+    'id',
+    'imageUrl',
+    'pinned',
+    'shareToken',
+    'title',
+    'updatedAt',
+    'userId',
+  ] as const
   $columns = NoteSchema.$columns
   @column()
   declare content: string
@@ -52,10 +63,20 @@ export class NoteSchema extends BaseModel {
   declare title: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+  @column()
+  declare userId: number | null
 }
 
 export class ProjectSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'status', 'title', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'description',
+    'id',
+    'status',
+    'title',
+    'updatedAt',
+    'userId',
+  ] as const
   $columns = ProjectSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -69,6 +90,8 @@ export class ProjectSchema extends BaseModel {
   declare title: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
+  @column()
+  declare userId: number
 }
 
 export class TodoLabelSchema extends BaseModel {
@@ -83,7 +106,15 @@ export class TodoLabelSchema extends BaseModel {
 }
 
 export class TodoSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'isCompleted', 'title', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'description',
+    'id',
+    'isCompleted',
+    'title',
+    'updatedAt',
+    'userId',
+  ] as const
   $columns = TodoSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -97,17 +128,32 @@ export class TodoSchema extends BaseModel {
   declare title: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+  @column()
+  declare userId: number | null
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['createdAt', 'email', 'fullName', 'id', 'password', 'updatedAt'] as const
+  static $columns = [
+    'avatarUrl',
+    'createdAt',
+    'email',
+    'fullName',
+    'googleId',
+    'id',
+    'password',
+    'updatedAt',
+  ] as const
   $columns = UserSchema.$columns
+  @column()
+  declare avatarUrl: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
   declare email: string
   @column()
   declare fullName: string | null
+  @column()
+  declare googleId: string | null
   @column({ isPrimary: true })
   declare id: number
   @column({ serializeAs: null })

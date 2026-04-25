@@ -79,6 +79,66 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/session_controller').default['destroy']>>>
     }
   }
+  'todoAuth.signupPage': {
+    methods: ["GET","HEAD"]
+    pattern: '/todo-auth/signup'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'todoAuth.loginPage': {
+    methods: ["GET","HEAD"]
+    pattern: '/todo-auth/login'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'todoAuth.signup': {
+    methods: ["POST"]
+    pattern: '/todo-auth/signup'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/todo_auths_controller').default['signup']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/todo_auths_controller').default['signup']>>>
+    }
+  }
+  'todoAuth.login': {
+    methods: ["POST"]
+    pattern: '/todo-auth/login'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/todo_auths_controller').default['login']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/todo_auths_controller').default['login']>>>
+    }
+  }
+  'todoAuth.logout': {
+    methods: ["POST"]
+    pattern: '/todo-auth/logout'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/todo_auths_controller').default['logout']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/todo_auths_controller').default['logout']>>>
+    }
+  }
   'notes.showShared': {
     methods: ["GET","HEAD"]
     pattern: '/notes/share/:token'
@@ -199,9 +259,21 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notes_controller').default['unshare']>>>
     }
   }
-  'todos.index': {
+  'todos.page': {
     methods: ["GET","HEAD"]
     pattern: '/todos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'todos.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/todos/data'
     types: {
       body: {}
       paramsTuple: []
@@ -257,6 +329,54 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/todos_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/todos_controller').default['destroy']>>>
+    }
+  }
+  'projectsAuth.page': {
+    methods: ["GET","HEAD"]
+    pattern: '/projects/auth'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['authPage']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['authPage']>>>
+    }
+  }
+  'projectsAuth.google.redirect': {
+    methods: ["GET","HEAD"]
+    pattern: '/projects/auth/google/redirect'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['redirect']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['redirect']>>>
+    }
+  }
+  'projectsAuth.google.callback': {
+    methods: ["GET","HEAD"]
+    pattern: '/projects/auth/google/callback'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['callback']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['callback']>>>
+    }
+  }
+  'projectsAuth.logout': {
+    methods: ["POST"]
+    pattern: '/projects/auth/logout'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['logout']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['logout']>>>
     }
   }
   'projects.index': {

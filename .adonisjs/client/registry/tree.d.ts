@@ -12,6 +12,13 @@ export interface ApiDefinition {
     store: typeof routes['session.store']
     destroy: typeof routes['session.destroy']
   }
+  todoAuth: {
+    signupPage: typeof routes['todoAuth.signupPage']
+    loginPage: typeof routes['todoAuth.loginPage']
+    signup: typeof routes['todoAuth.signup']
+    login: typeof routes['todoAuth.login']
+    logout: typeof routes['todoAuth.logout']
+  }
   notes: {
     showShared: typeof routes['notes.showShared']
     index: typeof routes['notes.index']
@@ -25,11 +32,20 @@ export interface ApiDefinition {
     unshare: typeof routes['notes.unshare']
   }
   todos: {
+    page: typeof routes['todos.page']
     index: typeof routes['todos.index']
     store: typeof routes['todos.store']
     show: typeof routes['todos.show']
     update: typeof routes['todos.update']
     destroy: typeof routes['todos.destroy']
+  }
+  projectsAuth: {
+    page: typeof routes['projectsAuth.page']
+    google: {
+      redirect: typeof routes['projectsAuth.google.redirect']
+      callback: typeof routes['projectsAuth.google.callback']
+    }
+    logout: typeof routes['projectsAuth.logout']
   }
   projects: {
     index: typeof routes['projects.index']

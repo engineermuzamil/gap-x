@@ -14,6 +14,9 @@ export default class Project extends BaseModel {
   @column()
   declare status: 'pending' | 'in-progress' | 'completed'
 
+  @column()
+  declare userId: number
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

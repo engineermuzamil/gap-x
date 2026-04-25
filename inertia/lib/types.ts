@@ -32,6 +32,7 @@ export type SortOption = 'pinned' | 'created_desc' | 'created_asc' | 'updated_de
 
 export interface Todo {
   id: number
+  userId: number
   title: string
   description: string | null
   isCompleted: boolean
@@ -61,4 +62,14 @@ export interface PaginatedProjects {
     perPage: number
     total: number
   }
+}
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+
+/** The logged-in user passed from ProjectsController → Inertia page props. */
+export interface AuthUser {
+  id: number
+  fullName: string | null
+  email: string
+  avatarUrl: string | null
 }

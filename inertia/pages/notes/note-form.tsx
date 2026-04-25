@@ -5,6 +5,7 @@ import axios from 'axios'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import markdownComponents from '../../lib/markdown-components'
+import { normalizeMarkdown } from '../../lib/normalize-markdown'
 import LabelPicker from '../../lib/label-picker'
 import type { Label } from '../../lib/types'
 import { ImageIcon, XCircleIcon, UploadIcon, Loader2Icon } from 'lucide-react'
@@ -56,6 +57,7 @@ export default function NoteForm({
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const displayedImageUrl = data.removeImage ? null : (data.imageUrl ?? existingImageUrl ?? null)
+  const normalizedContent = normalizeMarkdown(data.content)
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -136,7 +138,7 @@ export default function NoteForm({
             <div className="w-full px-4 py-3 bg-[#3A3A3C] rounded-lg min-h-[120px] text-sm prose-note">
               {data.content ? (
                 <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                  {data.content}
+                  {normalizedContent}
                 </ReactMarkdown>
               ) : (
                 <p className="text-[#98989D]">Nothing to preview yet.</p>

@@ -1,24 +1,47 @@
-import { Head, Link } from '@inertiajs/react'
-import { useForm } from '@inertiajs/react'
+import { Head, Link, router, useForm } from '@inertiajs/react'
 import { motion } from 'framer-motion'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, UserPlus } from 'lucide-react'
+import { useState } from 'react'
+import { authHeaders, getToken, signupForTodos } from '../../lib/todo-auth'
+import axios from 'axios'
 
-export default function Signup() {
-  const { data, setData, post, processing, errors } = useForm({
+export default function TodoSignup() {
+  const [loading, setLoading] = useState(false)
+  const { data, setData } = useForm({
     fullName: '',
     email: '',
     password: '',
     passwordConfirmation: '',
   })
+  const [error, setError] = useState<string | null>(null)
 
-  const submit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    post('/signup')
+    setError(null)
+
+    if (data.password !== data.passwordConfirmation) {
+      setError('Passwords do not match')
+      return
+    }
+
+    setLoading(true)
+    try {
+      await signupForTodos(data)
+      const token = getToken()
+      if (token) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      }
+      router.visit('/todos', { headers: authHeaders() })
+    } catch (err: any) {
+      setError(err.response?.data?.message ?? err.message ?? 'Something went wrong')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <>
-      <Head title="Sign Up" />
+      <Head title="Sign Up — Todos" />
       <div className="min-h-screen bg-[#1C1C1E] text-white flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -37,10 +60,25 @@ export default function Signup() {
               Back to home
             </Link>
 
-            <h1 className="text-2xl font-bold mb-1">Create account</h1>
-            <p className="text-sm text-[#98989D] mb-6">Enter your details to get started</p>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="p-2 bg-[#30D158]/10 rounded-lg">
+                <UserPlus size={20} className="text-[#30D158]" />
+              </div>
+              <h1 className="text-2xl font-bold">Create account</h1>
+            </div>
+            <p className="text-sm text-[#98989D] mb-6 ml-11">Start managing your todos</p>
 
-            <form onSubmit={submit} className="space-y-4">
+            {error && (
+              <motion.p
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 text-sm text-[#FF6B6B] bg-[#FF6B6B]/10 border border-[#FF6B6B]/20 rounded-lg px-4 py-2"
+              >
+                {error}
+              </motion.p>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="fullName" className="block text-sm text-[#98989D] mb-1.5">
                   Full name
@@ -51,11 +89,9 @@ export default function Signup() {
                   value={data.fullName}
                   onChange={(e) => setData('fullName', e.target.value)}
                   placeholder="John Doe"
+                  required
                   className="w-full px-4 py-3 bg-[#3A3A3C] text-white placeholder-[#98989D] rounded-lg focus:ring-2 focus:ring-[#0A84FF] focus:outline-none"
                 />
-                {errors.fullName && (
-                  <p className="mt-1 text-xs text-[#FF6B6B]">{errors.fullName}</p>
-                )}
               </div>
 
               <div>
@@ -69,9 +105,9 @@ export default function Signup() {
                   onChange={(e) => setData('email', e.target.value)}
                   placeholder="you@example.com"
                   autoComplete="email"
+                  required
                   className="w-full px-4 py-3 bg-[#3A3A3C] text-white placeholder-[#98989D] rounded-lg focus:ring-2 focus:ring-[#0A84FF] focus:outline-none"
                 />
-                {errors.email && <p className="mt-1 text-xs text-[#FF6B6B]">{errors.email}</p>}
               </div>
 
               <div>
@@ -84,11 +120,10 @@ export default function Signup() {
                   value={data.password}
                   onChange={(e) => setData('password', e.target.value)}
                   autoComplete="new-password"
+                  required
+                  minLength={8}
                   className="w-full px-4 py-3 bg-[#3A3A3C] text-white placeholder-[#98989D] rounded-lg focus:ring-2 focus:ring-[#0A84FF] focus:outline-none"
                 />
-                {errors.password && (
-                  <p className="mt-1 text-xs text-[#FF6B6B]">{errors.password}</p>
-                )}
               </div>
 
               <div>
@@ -104,27 +139,25 @@ export default function Signup() {
                   value={data.passwordConfirmation}
                   onChange={(e) => setData('passwordConfirmation', e.target.value)}
                   autoComplete="new-password"
+                  required
                   className="w-full px-4 py-3 bg-[#3A3A3C] text-white placeholder-[#98989D] rounded-lg focus:ring-2 focus:ring-[#0A84FF] focus:outline-none"
                 />
-                {errors.passwordConfirmation && (
-                  <p className="mt-1 text-xs text-[#FF6B6B]">{errors.passwordConfirmation}</p>
-                )}
               </div>
 
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
-                disabled={processing}
+                disabled={loading}
                 className="w-full bg-[#0A84FF] text-white py-3 rounded-lg font-medium hover:bg-[#0A74FF] disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-2"
               >
-                {processing ? 'Creating account...' : 'Sign up'}
+                {loading ? 'Creating account...' : 'Sign up'}
               </motion.button>
             </form>
 
             <p className="text-center text-sm text-[#98989D] mt-6">
               Already have an account?{' '}
-              <Link href="/login" className="text-[#0A84FF] hover:underline">
+              <Link href="/todo-auth/login" className="text-[#0A84FF] hover:underline">
                 Log in
               </Link>
             </p>

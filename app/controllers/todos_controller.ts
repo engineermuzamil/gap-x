@@ -1,12 +1,18 @@
-import { HttpContext } from '@adonisjs/core/http'
+import type { HttpContext } from '@adonisjs/core/http'
 import Todo from '#models/todo'
 import Label from '#models/label'
+import User from '#models/user'
 
 export default class TodosController {
-  async index({ inertia }: HttpContext) {
-    const [todos, labels] = await Promise.all([
-      Todo.query().preload('labels').orderBy('created_at', 'desc'),
+  /**
+   * GET /todos/data
+   * Returns all todos belonging to the authenticated user.
+   */
+  async index({ response, jwtUser }: HttpContext) {
+    const [todos, labels, user] = await Promise.all([
+      Todo.query().where('userId', jwtUser.userId).preload('labels').orderBy('created_at', 'desc'),
       Label.all(),
+      User.findOrFail(jwtUser.userId),
     ])
 
     const serialized = todos.map((todo) => ({
@@ -14,54 +20,83 @@ export default class TodosController {
       isCompleted: Boolean(todo.isCompleted),
     }))
 
-    return inertia.render('todos/index', { todos: serialized, labels } as never)
+    return response.ok({
+      todos: serialized,
+      labels,
+      user: {
+        fullName: user.fullName,
+        email: user.email,
+        initials: user.initials,
+      },
+    })
   }
 
-  async show({ params, response }: HttpContext) {
-    const todo = await Todo.find(params.id)
-    if (!todo) {
-      return response.notFound({ message: 'Todo not found' })
-    }
+  /**
+   * GET /todos/:id
+   * Returns one todo — only if it belongs to the authenticated user.
+   */
+  async show({ params, response, jwtUser }: HttpContext) {
+    const todo = await Todo.query().where('id', params.id).where('userId', jwtUser.userId).first()
+
+    if (!todo) return response.notFound({ message: 'Todo not found' })
+
     return response.json(todo)
   }
 
-  async store({ request, response }: HttpContext) {
+  /**
+   * POST /todos
+   * Creates a new todo owned by the authenticated user.
+   */
+  async store({ request, response, jwtUser }: HttpContext) {
     const data = request.only(['title', 'description', 'isCompleted'])
     const labelIds: number[] = request.input('labelIds', [])
 
-    const todo = await Todo.create(data)
+    const todo = await Todo.create({ ...data, userId: jwtUser.userId })
 
-    // Attach the selected labels to the todo via the pivot table
     if (labelIds.length > 0) {
       await todo.related('labels').attach(labelIds)
     }
 
-    return response.redirect().back()
+    await todo.load('labels')
+
+    return response.created({
+      ...todo.serialize(),
+      isCompleted: Boolean(todo.isCompleted),
+    })
   }
 
-  async update({ params, request, response }: HttpContext) {
-    const todo = await Todo.find(params.id)
-    if (!todo) {
-      return response.notFound({ message: 'Todo not found' })
-    }
+  /**
+   * PUT /todos/:id
+   * Updates a todo — only if it belongs to the authenticated user.
+   */
+  async update({ params, request, response, jwtUser }: HttpContext) {
+    const todo = await Todo.query().where('id', params.id).where('userId', jwtUser.userId).first()
+
+    if (!todo) return response.notFound({ message: 'Todo not found' })
 
     const data = request.only(['title', 'description', 'isCompleted'])
     const labelIds: number[] = request.input('labelIds', [])
 
     await todo.merge(data).save()
-
-    // sync() replaces all existing pivot records with the new set
     await todo.related('labels').sync(labelIds)
+    await todo.load('labels')
 
-    return response.redirect().back()
+    return response.ok({
+      ...todo.serialize(),
+      isCompleted: Boolean(todo.isCompleted),
+    })
   }
 
-  async destroy({ params, response }: HttpContext) {
-    const todo = await Todo.find(params.id)
-    if (!todo) {
-      return response.notFound({ message: 'Todo not found' })
-    }
+  /**
+   * DELETE /todos/:id
+   * Deletes a todo — only if it belongs to the authenticated user.
+   */
+  async destroy({ params, response, jwtUser }: HttpContext) {
+    const todo = await Todo.query().where('id', params.id).where('userId', jwtUser.userId).first()
+
+    if (!todo) return response.notFound({ message: 'Todo not found' })
+
     await todo.delete()
-    return response.redirect().back()
+    return response.ok({ message: 'Todo deleted' })
   }
 }

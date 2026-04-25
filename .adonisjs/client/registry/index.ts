@@ -42,6 +42,36 @@ const routes = {
     tokens: [{"old":"/logout","type":0,"val":"logout","end":""}],
     types: placeholder as Registry['session.destroy']['types'],
   },
+  'todoAuth.signupPage': {
+    methods: ["GET","HEAD"],
+    pattern: '/todo-auth/signup',
+    tokens: [{"old":"/todo-auth/signup","type":0,"val":"todo-auth","end":""},{"old":"/todo-auth/signup","type":0,"val":"signup","end":""}],
+    types: placeholder as Registry['todoAuth.signupPage']['types'],
+  },
+  'todoAuth.loginPage': {
+    methods: ["GET","HEAD"],
+    pattern: '/todo-auth/login',
+    tokens: [{"old":"/todo-auth/login","type":0,"val":"todo-auth","end":""},{"old":"/todo-auth/login","type":0,"val":"login","end":""}],
+    types: placeholder as Registry['todoAuth.loginPage']['types'],
+  },
+  'todoAuth.signup': {
+    methods: ["POST"],
+    pattern: '/todo-auth/signup',
+    tokens: [{"old":"/todo-auth/signup","type":0,"val":"todo-auth","end":""},{"old":"/todo-auth/signup","type":0,"val":"signup","end":""}],
+    types: placeholder as Registry['todoAuth.signup']['types'],
+  },
+  'todoAuth.login': {
+    methods: ["POST"],
+    pattern: '/todo-auth/login',
+    tokens: [{"old":"/todo-auth/login","type":0,"val":"todo-auth","end":""},{"old":"/todo-auth/login","type":0,"val":"login","end":""}],
+    types: placeholder as Registry['todoAuth.login']['types'],
+  },
+  'todoAuth.logout': {
+    methods: ["POST"],
+    pattern: '/todo-auth/logout',
+    tokens: [{"old":"/todo-auth/logout","type":0,"val":"todo-auth","end":""},{"old":"/todo-auth/logout","type":0,"val":"logout","end":""}],
+    types: placeholder as Registry['todoAuth.logout']['types'],
+  },
   'notes.showShared': {
     methods: ["GET","HEAD"],
     pattern: '/notes/share/:token',
@@ -102,10 +132,16 @@ const routes = {
     tokens: [{"old":"/notes/:id/share","type":0,"val":"notes","end":""},{"old":"/notes/:id/share","type":1,"val":"id","end":""},{"old":"/notes/:id/share","type":0,"val":"share","end":""}],
     types: placeholder as Registry['notes.unshare']['types'],
   },
-  'todos.index': {
+  'todos.page': {
     methods: ["GET","HEAD"],
     pattern: '/todos',
     tokens: [{"old":"/todos","type":0,"val":"todos","end":""}],
+    types: placeholder as Registry['todos.page']['types'],
+  },
+  'todos.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/todos/data',
+    tokens: [{"old":"/todos/data","type":0,"val":"todos","end":""},{"old":"/todos/data","type":0,"val":"data","end":""}],
     types: placeholder as Registry['todos.index']['types'],
   },
   'todos.store': {
@@ -131,6 +167,30 @@ const routes = {
     pattern: '/todos/:id',
     tokens: [{"old":"/todos/:id","type":0,"val":"todos","end":""},{"old":"/todos/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['todos.destroy']['types'],
+  },
+  'projectsAuth.page': {
+    methods: ["GET","HEAD"],
+    pattern: '/projects/auth',
+    tokens: [{"old":"/projects/auth","type":0,"val":"projects","end":""},{"old":"/projects/auth","type":0,"val":"auth","end":""}],
+    types: placeholder as Registry['projectsAuth.page']['types'],
+  },
+  'projectsAuth.google.redirect': {
+    methods: ["GET","HEAD"],
+    pattern: '/projects/auth/google/redirect',
+    tokens: [{"old":"/projects/auth/google/redirect","type":0,"val":"projects","end":""},{"old":"/projects/auth/google/redirect","type":0,"val":"auth","end":""},{"old":"/projects/auth/google/redirect","type":0,"val":"google","end":""},{"old":"/projects/auth/google/redirect","type":0,"val":"redirect","end":""}],
+    types: placeholder as Registry['projectsAuth.google.redirect']['types'],
+  },
+  'projectsAuth.google.callback': {
+    methods: ["GET","HEAD"],
+    pattern: '/projects/auth/google/callback',
+    tokens: [{"old":"/projects/auth/google/callback","type":0,"val":"projects","end":""},{"old":"/projects/auth/google/callback","type":0,"val":"auth","end":""},{"old":"/projects/auth/google/callback","type":0,"val":"google","end":""},{"old":"/projects/auth/google/callback","type":0,"val":"callback","end":""}],
+    types: placeholder as Registry['projectsAuth.google.callback']['types'],
+  },
+  'projectsAuth.logout': {
+    methods: ["POST"],
+    pattern: '/projects/auth/logout',
+    tokens: [{"old":"/projects/auth/logout","type":0,"val":"projects","end":""},{"old":"/projects/auth/logout","type":0,"val":"auth","end":""},{"old":"/projects/auth/logout","type":0,"val":"logout","end":""}],
+    types: placeholder as Registry['projectsAuth.logout']['types'],
   },
   'projects.index': {
     methods: ["GET","HEAD"],

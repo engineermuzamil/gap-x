@@ -1,7 +1,8 @@
-import { Head, useForm, Link, router, usePage } from '@inertiajs/react'
+import { Head, useForm, router, usePage } from '@inertiajs/react'
+import { Link } from '@adonisjs/inertia/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import { PlusIcon, XIcon, ArrowLeft } from 'lucide-react'
+import { PlusIcon, XIcon, ArrowLeft, LogOut } from 'lucide-react'
 import NoteCard from './note-card'
 import NoteForm from './note-form'
 import ViewSwitcher from './view-switcher'
@@ -13,10 +14,15 @@ import type { SortOption, Note, Label } from '../../lib/types'
 type ViewType = 'grid' | 'list'
 
 export default function Index() {
-  const { notes, trashedNotes, labels } = usePage<{
+  const { notes, trashedNotes, labels, user } = usePage<{
     notes: Note[]
     trashedNotes: Note[]
     labels: Label[]
+    user?: {
+      fullName: string | null
+      email: string
+      initials: string
+    }
   }>().props
 
   const [isFormVisible, setIsFormVisible] = useState(false)
@@ -100,6 +106,10 @@ export default function Index() {
     }
   }
 
+  const handleLogout = () => {
+    router.post('/logout')
+  }
+
   return (
     <>
       <Head title="Notes" />
@@ -121,6 +131,25 @@ export default function Index() {
             </div>
 
             <div className="flex items-center gap-3">
+              {user && (
+                <div className="flex items-center gap-3 rounded-full border border-[#3A3A3C] bg-[#2C2C2E] px-3 py-2">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0A84FF]/15 text-sm font-semibold text-[#7DB7FF]">
+                    {user.initials}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{user.fullName || 'Notes User'}</p>
+                    <p className="truncate text-xs text-[#98989D]">{user.email}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="rounded-full p-2 text-[#98989D] transition-colors hover:bg-[#3A3A3C] hover:text-white"
+                    title="Log out"
+                  >
+                    <LogOut size={16} />
+                  </button>
+                </div>
+              )}
               <SortSelector value={sortBy} onChange={setSortBy} />
               <ViewSwitcher currentView={viewType} onChange={setViewType} />
               <motion.button
