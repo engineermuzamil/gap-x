@@ -11,4 +11,6 @@ export const controllers = {
   Session: () => import('#controllers/session_controller'),
   TodoAuths: () => import('#controllers/todo_auths_controller'),
   Todos: () => import('#controllers/todos_controller'),
+  Giphy: () => import('#controllers/giphy_controller'),
+  Weather: () => import('#controllers/weather_controller'),
 }

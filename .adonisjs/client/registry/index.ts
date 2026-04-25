@@ -216,6 +216,18 @@ const routes = {
     tokens: [{"old":"/projects/:id","type":0,"val":"projects","end":""},{"old":"/projects/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['projects.destroy']['types'],
   },
+  'weather.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/weather',
+    tokens: [{"old":"/weather","type":0,"val":"weather","end":""}],
+    types: placeholder as Registry['weather.show']['types'],
+  },
+  'giphy.search': {
+    methods: ["GET","HEAD"],
+    pattern: '/giphy/search',
+    tokens: [{"old":"/giphy/search","type":0,"val":"giphy","end":""},{"old":"/giphy/search","type":0,"val":"search","end":""}],
+    types: placeholder as Registry['giphy.search']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

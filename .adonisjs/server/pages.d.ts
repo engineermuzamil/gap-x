@@ -35,5 +35,7 @@ declare module '@adonisjs/inertia/types' {
     'todos/todo-card': ExtractProps<(typeof import('../../inertia/pages/todos/todo-card.tsx'))['default']>
     'todos/todo-form': ExtractProps<(typeof import('../../inertia/pages/todos/todo-form.tsx'))['default']>
     'todos/view-switcher': ExtractProps<(typeof import('../../inertia/pages/todos/view-switcher.tsx'))['default']>
+    'notes/giphy-picker': ExtractProps<(typeof import('../../inertia/pages/notes/giphy-picker.tsx'))['default']>
+    'weather/index': ExtractProps<(typeof import('../../inertia/pages/weather/index.tsx'))['default']>
   }
 }

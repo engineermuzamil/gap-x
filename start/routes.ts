@@ -103,3 +103,9 @@ router
   .prefix('/projects')
   .as('projects')
   .use(middleware.auth({ redirectTo: '/projects/auth' }))
+
+// - Weather - API -----------------------------------------------------------
+router.get('/weather', [controllers.Weather, 'show']).as('weather.show')
+
+// ─── Giphy API ────────────────────────────────────────────────────────────────
+router.get('/giphy/search', [controllers.Giphy, 'search']).as('giphy.search')

@@ -9,6 +9,14 @@ import { normalizeMarkdown } from '../../lib/normalize-markdown'
 import LabelPicker from '../../lib/label-picker'
 import type { Label } from '../../lib/types'
 import { ImageIcon, XCircleIcon, UploadIcon, Loader2Icon } from 'lucide-react'
+import GiphyPicker from './giphy-picker'
+
+interface Gif {
+  id: string
+  title: string
+  previewUrl: string
+  originalUrl: string
+}
 
 interface NoteFormProps {
   data: {
@@ -28,18 +36,11 @@ interface NoteFormProps {
   existingImageUrl?: string | null
 }
 
-const MARKDOWN_PLACEHOLDER = `Write your note here... Markdown is supported.
+const MARKDOWN_PLACEHOLDER = `Write your note here...
 
-## Heading
-**bold**, *italic*, \`inline code\`
+Type /giphy to search and insert a GIF!
 
-- list item
-
-\`\`\`ts
-const hello = 'world'
-\`\`\`
-
-> blockquote`
+Markdown supported: **bold**, *italic*, \`code\`, > blockquote`
 
 export default function NoteForm({
   data,
@@ -56,24 +57,92 @@ export default function NoteForm({
   const [uploadError, setUploadError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // null  = picker is hidden
+  // string = picker is open with this search query e.g. "cats"
+  const [giphyQuery, setGiphyQuery] = useState<string | null>(null)
+
+  // Pre-fetched GIFs — fetched the moment /giphy is detected so picker
+  // shows results instantly without any loading wait
+  const [preloadedGifs, setPreloadedGifs] = useState<Gif[]>([])
+
   const displayedImageUrl = data.removeImage ? null : (data.imageUrl ?? existingImageUrl ?? null)
   const normalizedContent = normalizeMarkdown(data.content)
 
+  // ── Preload GIFs in the background ────────────────────────────────────────
+  // Called as soon as /giphy is detected — before the picker even opens.
+  // By the time the picker renders, gifs are already ready.
+  const preloadGifs = async (q: string) => {
+    try {
+      const res = await fetch(`/giphy/search?q=${encodeURIComponent(q)}`)
+      if (!res.ok) return
+      const json = (await res.json()) as { gifs: Gif[] }
+      setPreloadedGifs(json.gifs)
+    } catch {
+      // Silent fail — picker will fetch on its own if preload didn't work
+    }
+  }
+
+  // ── Detect /giphy on every keystroke ──────────────────────────────────────
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value
+
+    // Always sync useForm first — it stays the single owner of content
+    setData('content', value)
+
+    // Check the last line — that's where the user is actively typing
+    const lines = value.split('\n')
+    const lastLine = lines[lines.length - 1]
+
+    // Match /giphy with anything (or nothing) after it
+    // "/giphy"       → query = "trending"
+    // "/giphy cats"  → query = "cats"
+    const match = lastLine.match(/^\/giphy(.*)/)
+
+    if (match) {
+      const query = match[1].trim() || 'trending'
+
+      // Only preload + open picker when query actually changes
+      if (query !== giphyQuery) {
+        setGiphyQuery(query)
+        // Preload GIFs immediately in background — no debounce here
+        // so results are ready the moment the picker opens
+        preloadGifs(query)
+      }
+    } else {
+      // /giphy not found on last line — close picker and clear preloaded gifs
+      setGiphyQuery(null)
+      setPreloadedGifs([])
+    }
+  }
+
+  // ── User picks a GIF ──────────────────────────────────────────────────────
+  const handleGifSelect = (gifUrl: string) => {
+    // Remove the /giphy line and replace with markdown image
+    const lines = data.content.split('\n')
+    lines.pop() // remove the /giphy ... line
+    const base = lines.join('\n').trimEnd()
+    const newContent = `${base}\n\n![gif](${gifUrl})\n`
+
+    // Update useForm — keeps Inertia in sync
+    setData('content', newContent)
+
+    // Close picker and clear preloaded gifs
+    setGiphyQuery(null)
+    setPreloadedGifs([])
+  }
+
+  // ── Image upload ──────────────────────────────────────────────────────────
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-
     setUploadError(null)
     setUploading(true)
-
     try {
       const formData = new FormData()
       formData.append('image', file)
-
       const response = await axios.post<{ url: string }>('/notes/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
-
       setData('imageUrl', response.data.url)
       setData('removeImage', false)
     } catch {
@@ -100,7 +169,7 @@ export default function NoteForm({
       </h2>
 
       <form onSubmit={submit}>
-        {/* Title */}
+        {/* ── Title ── */}
         <div className="mb-4">
           <motion.input
             whileFocus={{ scale: 1.01 }}
@@ -114,9 +183,9 @@ export default function NoteForm({
           />
         </div>
 
-        {/* Write / Preview toggle */}
+        {/* ── Write / Preview tabs ── */}
         <div className="flex items-center gap-2 mb-2">
-          {['Write', 'Preview'].map((tab) => (
+          {(['Write', 'Preview'] as const).map((tab) => (
             <button
               key={tab}
               type="button"
@@ -132,9 +201,10 @@ export default function NoteForm({
           ))}
         </div>
 
-        {/* Content */}
+        {/* ── Content area ── */}
         <div className="mb-4">
           {preview ? (
+            // Preview tab — renders markdown including any inserted GIFs
             <div className="w-full px-4 py-3 bg-[#3A3A3C] rounded-lg min-h-[120px] text-sm prose-note">
               {data.content ? (
                 <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
@@ -145,27 +215,45 @@ export default function NoteForm({
               )}
             </div>
           ) : (
-            <motion.textarea
-              whileFocus={{ scale: 1.01 }}
-              transition={{ duration: 0.2 }}
-              value={data.content}
-              onChange={(e) => setData('content', e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={MARKDOWN_PLACEHOLDER}
-              className="w-full px-4 py-3 bg-[#3A3A3C] text-white placeholder-[#98989D] rounded-lg border-none focus:ring-2 focus:ring-[#0A84FF] focus:outline-none min-h-[120px] transition-all duration-200 font-mono text-sm"
-              required
-            />
+            <div>
+              <motion.textarea
+                whileFocus={{ scale: 1.01 }}
+                transition={{ duration: 0.2 }}
+                value={data.content}
+                onChange={handleContentChange}
+                onKeyDown={handleKeyDown}
+                placeholder={MARKDOWN_PLACEHOLDER}
+                className="w-full px-4 py-3 bg-[#3A3A3C] text-white placeholder-[#98989D] rounded-lg border-none focus:ring-2 focus:ring-[#0A84FF] focus:outline-none min-h-[120px] transition-all duration-200 font-mono text-sm"
+                required
+              />
+
+              {/* Giphy picker — renders when giphyQuery is set */}
+              {giphyQuery !== null && (
+                <GiphyPicker
+                  query={giphyQuery}
+                  initialGifs={preloadedGifs}
+                  onSelect={handleGifSelect}
+                  onClose={() => {
+                    setGiphyQuery(null)
+                    setPreloadedGifs([])
+                  }}
+                />
+              )}
+
+              <p className="mt-1.5 text-xs text-[#48484A]">
+                Tip: type <span className="font-mono text-[#98989D]">/giphy</span> to insert a GIF
+              </p>
+            </div>
           )}
         </div>
 
-        {/* ── Image upload section ─────────────────────────────────────────── */}
+        {/* ── Image upload ── */}
         <div className="mb-4">
           <p className="text-xs text-[#98989D] mb-2 flex items-center gap-1.5">
             <ImageIcon size={13} />
             Image (optional · jpg, png, gif, webp · max 5 MB)
           </p>
 
-          {/* Preview area */}
           <AnimatePresence>
             {displayedImageUrl && (
               <motion.div
@@ -192,7 +280,6 @@ export default function NoteForm({
             )}
           </AnimatePresence>
 
-          {/* Upload button / spinner */}
           <label
             className={`flex items-center gap-2 w-fit ${uploading ? 'cursor-wait' : 'cursor-pointer'}`}
           >
@@ -205,13 +292,11 @@ export default function NoteForm({
             >
               {uploading ? (
                 <>
-                  <Loader2Icon size={14} className="animate-spin" />
-                  Uploading...
+                  <Loader2Icon size={14} className="animate-spin" /> Uploading...
                 </>
               ) : (
                 <>
-                  <UploadIcon size={14} />
-                  {displayedImageUrl ? 'Replace image' : 'Upload image'}
+                  <UploadIcon size={14} /> {displayedImageUrl ? 'Replace image' : 'Upload image'}
                 </>
               )}
             </span>
@@ -225,18 +310,17 @@ export default function NoteForm({
             />
           </label>
 
-          {/* Upload error message */}
           {uploadError && <p className="mt-1.5 text-xs text-[#FF6B6B]">{uploadError}</p>}
         </div>
 
-        {/* Labels */}
+        {/* ── Labels ── */}
         <LabelPicker
           allLabels={allLabels}
           selectedIds={data.labelIds}
           onChange={(ids) => setData('labelIds', ids)}
         />
 
-        {/* Pin toggle */}
+        {/* ── Pin toggle ── */}
         <div className="mb-4">
           <button
             type="button"
@@ -251,6 +335,7 @@ export default function NoteForm({
           </button>
         </div>
 
+        {/* ── Submit ── */}
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
