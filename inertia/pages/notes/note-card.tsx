@@ -67,7 +67,7 @@ export default function NoteCard({ note, viewType, onEdit, onDelete, onTogglePin
 
   const handleCopyLink = () => {
     if (!shareToken) return
-    navigator.clipboard.writeText(`${window.location.origin}/notes/shared/${shareToken}`)
+    navigator.clipboard.writeText(`${window.location.origin}/notes/share/${shareToken}`)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
