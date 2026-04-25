@@ -17,7 +17,6 @@ declare module '@adonisjs/inertia/types' {
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.tsx'))['default']>
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.tsx'))['default']>
     'home': ExtractProps<(typeof import('../../inertia/pages/home.tsx'))['default']>
-    'notes/flash-toast': ExtractProps<(typeof import('../../inertia/pages/notes/flash-toast.tsx'))['default']>
     'notes/index': ExtractProps<(typeof import('../../inertia/pages/notes/index.tsx'))['default']>
     'notes/note-card': ExtractProps<(typeof import('../../inertia/pages/notes/note-card.tsx'))['default']>
     'notes/note-form': ExtractProps<(typeof import('../../inertia/pages/notes/note-form.tsx'))['default']>
@@ -33,5 +32,6 @@ declare module '@adonisjs/inertia/types' {
     'todos/todo-card': ExtractProps<(typeof import('../../inertia/pages/todos/todo-card.tsx'))['default']>
     'todos/todo-form': ExtractProps<(typeof import('../../inertia/pages/todos/todo-form.tsx'))['default']>
     'todos/view-switcher': ExtractProps<(typeof import('../../inertia/pages/todos/view-switcher.tsx'))['default']>
+    'notes/flash-toast': ExtractProps<(typeof import('../../inertia/pages/notes/flash-toast.tsx'))['default']>
   }
 }
