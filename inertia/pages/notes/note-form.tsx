@@ -11,6 +11,13 @@ import type { Label } from '../../lib/types'
 import { ImageIcon, XCircleIcon, UploadIcon, Loader2Icon } from 'lucide-react'
 import GiphyPicker from './giphy-picker'
 
+interface Gif {
+  id: string
+  title: string
+  previewUrl: string
+  originalUrl: string
+}
+
 interface NoteFormProps {
   data: {
     title: string
@@ -50,41 +57,81 @@ export default function NoteForm({
   const [uploadError, setUploadError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // null  = picker is hidden
+  // string = picker is open with this search query e.g. "cats"
   const [giphyQuery, setGiphyQuery] = useState<string | null>(null)
+
+  // Pre-fetched GIFs — fetched the moment /giphy is detected so picker
+  // shows results instantly without any loading wait
+  const [preloadedGifs, setPreloadedGifs] = useState<Gif[]>([])
 
   const displayedImageUrl = data.removeImage ? null : (data.imageUrl ?? existingImageUrl ?? null)
   const normalizedContent = normalizeMarkdown(data.content)
 
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value
-
-    setData('content', value)
-
-    const lines = value.split('\n')
-    const lastLine = lines[lines.length - 1]
-
-    const match = lastLine.match(/^\/giphy(.*)/)
-
-    if (match) {
-      setGiphyQuery(match[1].trim() || 'trending')
-    } else {
-      setGiphyQuery(null)
+  // ── Preload GIFs in the background ────────────────────────────────────────
+  // Called as soon as /giphy is detected — before the picker even opens.
+  // By the time the picker renders, gifs are already ready.
+  const preloadGifs = async (q: string) => {
+    try {
+      const res = await fetch(`/giphy/search?q=${encodeURIComponent(q)}`)
+      if (!res.ok) return
+      const json = (await res.json()) as { gifs: Gif[] }
+      setPreloadedGifs(json.gifs)
+    } catch {
+      // Silent fail — picker will fetch on its own if preload didn't work
     }
   }
 
-  // ── User picks a GIF from the picker ───────────────────────────────────────
-  const handleGifSelect = (gifUrl: string) => {
-    const lines = data.content.split('\n')
-    lines.pop()
+  // ── Detect /giphy on every keystroke ──────────────────────────────────────
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value
 
-    const base = lines.join('\n').trimEnd()
-    const newContent = base + '\n\n' + `![gif](${gifUrl})` + '\n'
+    // Always sync useForm first — it stays the single owner of content
+    setData('content', value)
 
-    setData('content', newContent)
-    setGiphyQuery(null)
+    // Check the last line — that's where the user is actively typing
+    const lines = value.split('\n')
+    const lastLine = lines[lines.length - 1]
+
+    // Match /giphy with anything (or nothing) after it
+    // "/giphy"       → query = "trending"
+    // "/giphy cats"  → query = "cats"
+    const match = lastLine.match(/^\/giphy(.*)/)
+
+    if (match) {
+      const query = match[1].trim() || 'trending'
+
+      // Only preload + open picker when query actually changes
+      if (query !== giphyQuery) {
+        setGiphyQuery(query)
+        // Preload GIFs immediately in background — no debounce here
+        // so results are ready the moment the picker opens
+        preloadGifs(query)
+      }
+    } else {
+      // /giphy not found on last line — close picker and clear preloaded gifs
+      setGiphyQuery(null)
+      setPreloadedGifs([])
+    }
   }
 
-  // ── Image upload handlers  ──────────────────────────────────────
+  // ── User picks a GIF ──────────────────────────────────────────────────────
+  const handleGifSelect = (gifUrl: string) => {
+    // Remove the /giphy line and replace with markdown image
+    const lines = data.content.split('\n')
+    lines.pop() // remove the /giphy ... line
+    const base = lines.join('\n').trimEnd()
+    const newContent = `${base}\n\n![gif](${gifUrl})\n`
+
+    // Update useForm — keeps Inertia in sync
+    setData('content', newContent)
+
+    // Close picker and clear preloaded gifs
+    setGiphyQuery(null)
+    setPreloadedGifs([])
+  }
+
+  // ── Image upload ──────────────────────────────────────────────────────────
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -157,7 +204,7 @@ export default function NoteForm({
         {/* ── Content area ── */}
         <div className="mb-4">
           {preview ? (
-            // Preview tab — renders markdown including GIFs
+            // Preview tab — renders markdown including any inserted GIFs
             <div className="w-full px-4 py-3 bg-[#3A3A3C] rounded-lg min-h-[120px] text-sm prose-note">
               {data.content ? (
                 <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
@@ -168,7 +215,6 @@ export default function NoteForm({
               )}
             </div>
           ) : (
-            // Write tab — textarea + giphy picker below it
             <div>
               <motion.textarea
                 whileFocus={{ scale: 1.01 }}
@@ -181,18 +227,21 @@ export default function NoteForm({
                 required
               />
 
-              {/* Giphy picker — mounts when giphyQuery is not null */}
+              {/* Giphy picker — renders when giphyQuery is set */}
               {giphyQuery !== null && (
                 <GiphyPicker
                   query={giphyQuery}
+                  initialGifs={preloadedGifs}
                   onSelect={handleGifSelect}
-                  onClose={() => setGiphyQuery(null)}
+                  onClose={() => {
+                    setGiphyQuery(null)
+                    setPreloadedGifs([])
+                  }}
                 />
               )}
 
-              {/* Hint shown at all times in write mode */}
               <p className="mt-1.5 text-xs text-[#48484A]">
-                Tip: type <span className="text-[#98989D] font-mono">/giphy</span> to insert a GIF
+                Tip: type <span className="font-mono text-[#98989D]">/giphy</span> to insert a GIF
               </p>
             </div>
           )}

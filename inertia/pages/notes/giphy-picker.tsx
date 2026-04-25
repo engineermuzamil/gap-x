@@ -10,28 +10,38 @@ interface Gif {
 
 interface GiphyPickerProps {
   query: string
+  // Pre-fetched GIFs from note-form — so picker shows results instantly on open
+  initialGifs?: Gif[]
   onSelect: (gifUrl: string) => void
   onClose: () => void
 }
 
-export default function GiphyPicker({ query, onSelect, onClose }: GiphyPickerProps) {
-  const [gifs, setGifs] = useState<Gif[]>([])
-  const [loading, setLoading] = useState(false)
+export default function GiphyPicker({
+  query,
+  initialGifs = [],
+  onSelect,
+  onClose,
+}: GiphyPickerProps) {
+  // Start with pre-fetched GIFs so the grid shows immediately — no loading wait
+  const [gifs, setGifs] = useState<Gif[]>(initialGifs)
+  const [loading, setLoading] = useState(initialGifs.length === 0)
   const [error, setError] = useState<string | null>(null)
-  // searchTerm is what shows in the input inside the picker
   const [searchTerm, setSearchTerm] = useState(query)
 
-  // When user keeps typing after /giphy, update the search term
+  // Sync search term when parent query changes (user keeps typing after /giphy)
   useEffect(() => {
     setSearchTerm(query)
   }, [query])
 
-  // Fetch GIFs whenever searchTerm changes, debounced 400ms
+  // Debounced fetch — runs 400ms after user stops typing in the search input
+  // If initialGifs were provided and query hasn't changed, skip the first fetch
   useEffect(() => {
     if (!searchTerm.trim()) return
-    const timer = setTimeout(() => {
-      fetchGifs(searchTerm)
-    }, 400)
+
+    // If we already have initialGifs for this exact query, don't refetch
+    if (initialGifs.length > 0 && searchTerm === query) return
+
+    const timer = setTimeout(() => fetchGifs(searchTerm), 400)
     return () => clearTimeout(timer)
   }, [searchTerm])
 
@@ -43,8 +53,8 @@ export default function GiphyPicker({ query, onSelect, onClose }: GiphyPickerPro
       if (!res.ok) throw new Error('Bad response')
       const json = (await res.json()) as { gifs: Gif[] }
       setGifs(json.gifs)
-    } catch (err) {
-      setError('Could not load GIFs. Check your API key and route.')
+    } catch {
+      setError('Could not load GIFs. Check your API key.')
     } finally {
       setLoading(false)
     }
@@ -61,7 +71,7 @@ export default function GiphyPicker({ query, onSelect, onClose }: GiphyPickerPro
         <button
           type="button"
           onClick={onClose}
-          className="text-[#98989D] hover:text-white transition-colors p-1"
+          className="p-1 text-[#98989D] hover:text-white transition-colors"
         >
           <XIcon size={15} />
         </button>
@@ -82,7 +92,7 @@ export default function GiphyPicker({ query, onSelect, onClose }: GiphyPickerPro
         </div>
       </div>
 
-      {/* ── Results ── */}
+      {/* ── GIF grid ── */}
       <div className="max-h-60 overflow-y-auto p-3">
         {loading && (
           <div className="flex justify-center py-6">
@@ -92,7 +102,7 @@ export default function GiphyPicker({ query, onSelect, onClose }: GiphyPickerPro
 
         {!loading && error && <p className="py-6 text-center text-sm text-[#FF6B6B]">{error}</p>}
 
-        {!loading && !error && gifs.length === 0 && searchTerm.trim() && (
+        {!loading && !error && gifs.length === 0 && (
           <p className="py-6 text-center text-sm text-[#98989D]">
             No GIFs found for "{searchTerm}"
           </p>
