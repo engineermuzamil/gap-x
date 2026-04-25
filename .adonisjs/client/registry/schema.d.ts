@@ -439,4 +439,16 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/weather_controller').default['show']>>>
     }
   }
+  'giphy.search': {
+    methods: ["GET","HEAD"]
+    pattern: '/giphy/search'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/giphy_controller').default['search']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/giphy_controller').default['search']>>>
+    }
+  }
 }

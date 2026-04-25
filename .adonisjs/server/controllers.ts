@@ -4,6 +4,7 @@
  */
 
 export const controllers = {
+  Giphy: () => import('#controllers/giphy_controller'),
   GoogleAuths: () => import('#controllers/google_auths_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Notes: () => import('#controllers/notes_controller'),

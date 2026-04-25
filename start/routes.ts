@@ -106,3 +106,6 @@ router
 
 // - Weather - API -----------------------------------------------------------
 router.get('/weather', [controllers.Weather, 'show']).as('weather.show')
+
+// ─── Giphy API ────────────────────────────────────────────────────────────────
+router.get('/giphy/search', [controllers.Giphy, 'search']).as('giphy.search')

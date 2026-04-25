@@ -9,6 +9,7 @@ import { normalizeMarkdown } from '../../lib/normalize-markdown'
 import LabelPicker from '../../lib/label-picker'
 import type { Label } from '../../lib/types'
 import { ImageIcon, XCircleIcon, UploadIcon, Loader2Icon } from 'lucide-react'
+import GiphyPicker from './giphy-picker'
 
 interface NoteFormProps {
   data: {
@@ -28,18 +29,11 @@ interface NoteFormProps {
   existingImageUrl?: string | null
 }
 
-const MARKDOWN_PLACEHOLDER = `Write your note here... Markdown is supported.
+const MARKDOWN_PLACEHOLDER = `Write your note here...
 
-## Heading
-**bold**, *italic*, \`inline code\`
+Type /giphy to search and insert a GIF!
 
-- list item
-
-\`\`\`ts
-const hello = 'world'
-\`\`\`
-
-> blockquote`
+Markdown supported: **bold**, *italic*, \`code\`, > blockquote`
 
 export default function NoteForm({
   data,
@@ -56,24 +50,52 @@ export default function NoteForm({
   const [uploadError, setUploadError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const [giphyQuery, setGiphyQuery] = useState<string | null>(null)
+
   const displayedImageUrl = data.removeImage ? null : (data.imageUrl ?? existingImageUrl ?? null)
   const normalizedContent = normalizeMarkdown(data.content)
 
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value
+
+    setData('content', value)
+
+    const lines = value.split('\n')
+    const lastLine = lines[lines.length - 1]
+
+    const match = lastLine.match(/^\/giphy(.*)/)
+
+    if (match) {
+      setGiphyQuery(match[1].trim() || 'trending')
+    } else {
+      setGiphyQuery(null)
+    }
+  }
+
+  // ── User picks a GIF from the picker ───────────────────────────────────────
+  const handleGifSelect = (gifUrl: string) => {
+    const lines = data.content.split('\n')
+    lines.pop()
+
+    const base = lines.join('\n').trimEnd()
+    const newContent = base + '\n\n' + `![gif](${gifUrl})` + '\n'
+
+    setData('content', newContent)
+    setGiphyQuery(null)
+  }
+
+  // ── Image upload handlers  ──────────────────────────────────────
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-
     setUploadError(null)
     setUploading(true)
-
     try {
       const formData = new FormData()
       formData.append('image', file)
-
       const response = await axios.post<{ url: string }>('/notes/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
-
       setData('imageUrl', response.data.url)
       setData('removeImage', false)
     } catch {
@@ -100,7 +122,7 @@ export default function NoteForm({
       </h2>
 
       <form onSubmit={submit}>
-        {/* Title */}
+        {/* ── Title ── */}
         <div className="mb-4">
           <motion.input
             whileFocus={{ scale: 1.01 }}
@@ -114,9 +136,9 @@ export default function NoteForm({
           />
         </div>
 
-        {/* Write / Preview toggle */}
+        {/* ── Write / Preview tabs ── */}
         <div className="flex items-center gap-2 mb-2">
-          {['Write', 'Preview'].map((tab) => (
+          {(['Write', 'Preview'] as const).map((tab) => (
             <button
               key={tab}
               type="button"
@@ -132,9 +154,10 @@ export default function NoteForm({
           ))}
         </div>
 
-        {/* Content */}
+        {/* ── Content area ── */}
         <div className="mb-4">
           {preview ? (
+            // Preview tab — renders markdown including GIFs
             <div className="w-full px-4 py-3 bg-[#3A3A3C] rounded-lg min-h-[120px] text-sm prose-note">
               {data.content ? (
                 <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
@@ -145,27 +168,43 @@ export default function NoteForm({
               )}
             </div>
           ) : (
-            <motion.textarea
-              whileFocus={{ scale: 1.01 }}
-              transition={{ duration: 0.2 }}
-              value={data.content}
-              onChange={(e) => setData('content', e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={MARKDOWN_PLACEHOLDER}
-              className="w-full px-4 py-3 bg-[#3A3A3C] text-white placeholder-[#98989D] rounded-lg border-none focus:ring-2 focus:ring-[#0A84FF] focus:outline-none min-h-[120px] transition-all duration-200 font-mono text-sm"
-              required
-            />
+            // Write tab — textarea + giphy picker below it
+            <div>
+              <motion.textarea
+                whileFocus={{ scale: 1.01 }}
+                transition={{ duration: 0.2 }}
+                value={data.content}
+                onChange={handleContentChange}
+                onKeyDown={handleKeyDown}
+                placeholder={MARKDOWN_PLACEHOLDER}
+                className="w-full px-4 py-3 bg-[#3A3A3C] text-white placeholder-[#98989D] rounded-lg border-none focus:ring-2 focus:ring-[#0A84FF] focus:outline-none min-h-[120px] transition-all duration-200 font-mono text-sm"
+                required
+              />
+
+              {/* Giphy picker — mounts when giphyQuery is not null */}
+              {giphyQuery !== null && (
+                <GiphyPicker
+                  query={giphyQuery}
+                  onSelect={handleGifSelect}
+                  onClose={() => setGiphyQuery(null)}
+                />
+              )}
+
+              {/* Hint shown at all times in write mode */}
+              <p className="mt-1.5 text-xs text-[#48484A]">
+                Tip: type <span className="text-[#98989D] font-mono">/giphy</span> to insert a GIF
+              </p>
+            </div>
           )}
         </div>
 
-        {/* ── Image upload section ─────────────────────────────────────────── */}
+        {/* ── Image upload ── */}
         <div className="mb-4">
           <p className="text-xs text-[#98989D] mb-2 flex items-center gap-1.5">
             <ImageIcon size={13} />
             Image (optional · jpg, png, gif, webp · max 5 MB)
           </p>
 
-          {/* Preview area */}
           <AnimatePresence>
             {displayedImageUrl && (
               <motion.div
@@ -192,7 +231,6 @@ export default function NoteForm({
             )}
           </AnimatePresence>
 
-          {/* Upload button / spinner */}
           <label
             className={`flex items-center gap-2 w-fit ${uploading ? 'cursor-wait' : 'cursor-pointer'}`}
           >
@@ -205,13 +243,11 @@ export default function NoteForm({
             >
               {uploading ? (
                 <>
-                  <Loader2Icon size={14} className="animate-spin" />
-                  Uploading...
+                  <Loader2Icon size={14} className="animate-spin" /> Uploading...
                 </>
               ) : (
                 <>
-                  <UploadIcon size={14} />
-                  {displayedImageUrl ? 'Replace image' : 'Upload image'}
+                  <UploadIcon size={14} /> {displayedImageUrl ? 'Replace image' : 'Upload image'}
                 </>
               )}
             </span>
@@ -225,18 +261,17 @@ export default function NoteForm({
             />
           </label>
 
-          {/* Upload error message */}
           {uploadError && <p className="mt-1.5 text-xs text-[#FF6B6B]">{uploadError}</p>}
         </div>
 
-        {/* Labels */}
+        {/* ── Labels ── */}
         <LabelPicker
           allLabels={allLabels}
           selectedIds={data.labelIds}
           onChange={(ids) => setData('labelIds', ids)}
         />
 
-        {/* Pin toggle */}
+        {/* ── Pin toggle ── */}
         <div className="mb-4">
           <button
             type="button"
@@ -251,6 +286,7 @@ export default function NoteForm({
           </button>
         </div>
 
+        {/* ── Submit ── */}
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}

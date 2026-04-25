@@ -40,6 +40,7 @@ export type ScannedRoutes = {
     'projects.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'projects.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'weather.show': { paramsTuple?: []; params?: {} }
+    'giphy.search': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'home': { paramsTuple?: []; params?: {} }
@@ -57,6 +58,7 @@ export type ScannedRoutes = {
     'projectsAuth.google.callback': { paramsTuple?: []; params?: {} }
     'projects.index': { paramsTuple?: []; params?: {} }
     'weather.show': { paramsTuple?: []; params?: {} }
+    'giphy.search': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'home': { paramsTuple?: []; params?: {} }
@@ -74,6 +76,7 @@ export type ScannedRoutes = {
     'projectsAuth.google.callback': { paramsTuple?: []; params?: {} }
     'projects.index': { paramsTuple?: []; params?: {} }
     'weather.show': { paramsTuple?: []; params?: {} }
+    'giphy.search': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'new_account.store': { paramsTuple?: []; params?: {} }

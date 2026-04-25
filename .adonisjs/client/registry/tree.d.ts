@@ -56,4 +56,7 @@ export interface ApiDefinition {
   weather: {
     show: typeof routes['weather.show']
   }
+  giphy: {
+    search: typeof routes['giphy.search']
+  }
 }
