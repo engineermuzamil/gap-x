@@ -1,17 +1,24 @@
-import { Head, useForm, Link, router, usePage } from '@inertiajs/react'
+import { Head, useForm, router, usePage } from '@inertiajs/react'
+import { Link } from '@adonisjs/inertia/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import { PlusIcon, XIcon, ArrowLeft } from 'lucide-react'
+import { PlusIcon, XIcon, ArrowLeft, LogOut } from 'lucide-react'
 import ProjectCard from './project-card'
 import ProjectForm from './project-form'
 import ViewSwitcher from '../notes/view-switcher'
-import type { Project, PaginatedProjects, ProjectStatus } from '../../lib/types'
+import type { AuthUser, PaginatedProjects, Project, ProjectStatus } from '../../lib/types'
 
 type ViewType = 'grid' | 'list'
 
+interface PageProps extends Record<string, unknown> {
+  projects: PaginatedProjects
+  authUser: AuthUser
+}
+
 export default function Index() {
-  // usePage() pulls props from Inertia
-  const { projects } = usePage<{ projects: PaginatedProjects }>().props
+  const { projects, authUser } = usePage<PageProps>().props
+  const displayName = authUser.fullName || 'Projects User'
+  const userInitial = (authUser.fullName || authUser.email).charAt(0).toUpperCase()
 
   const [isFormVisible, setIsFormVisible] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
@@ -71,11 +78,16 @@ export default function Index() {
     router.get('/projects', { page }, { preserveState: true })
   }
 
+  const handleLogout = () => {
+    router.post('/projects/auth/logout')
+  }
+
   return (
     <>
       <Head title="Projects" />
       <div className="min-h-screen bg-[#1C1C1E] text-white">
         <div className="max-w-4xl mx-auto p-6">
+          {/* ── Top bar ──────────────────────────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -92,7 +104,34 @@ export default function Index() {
             </div>
 
             <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 rounded-full border border-[#3A3A3C] bg-[#2C2C2E] px-3 py-2">
+                {authUser.avatarUrl ? (
+                  <img
+                    src={authUser.avatarUrl}
+                    alt={authUser.fullName ?? authUser.email}
+                    className="h-9 w-9 rounded-full border border-[#3A3A3C] object-cover"
+                  />
+                ) : (
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0A84FF]/15 text-sm font-semibold text-[#7DB7FF]">
+                    {userInitial}
+                  </div>
+                )}
+                <div className="hidden min-w-0 sm:block">
+                  <p className="truncate text-sm font-medium">{displayName}</p>
+                  <p className="truncate text-xs text-[#98989D]">{authUser.email}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  title="Log out"
+                  className="rounded-full p-2 text-[#98989D] transition-colors hover:bg-[#3A3A3C] hover:text-white"
+                >
+                  <LogOut size={16} />
+                </button>
+              </div>
+
               <ViewSwitcher currentView={viewType} onChange={setViewType} />
+
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={handleToggleForm}
@@ -103,6 +142,7 @@ export default function Index() {
             </div>
           </motion.div>
 
+          {/* ── Project form ─────────────────────────────────────────────── */}
           <AnimatePresence>
             {isFormVisible && (
               <motion.div
@@ -124,6 +164,7 @@ export default function Index() {
             )}
           </AnimatePresence>
 
+          {/* ── Empty state ───────────────────────────────────────────────── */}
           {!projects.data.length ? (
             <motion.div
               initial={{ opacity: 0 }}
@@ -165,7 +206,7 @@ export default function Index() {
             </motion.div>
           )}
 
-          {/* Pagination */}
+          {/* ── Pagination ────────────────────────────────────────────────── */}
           {projects.meta.lastPage > 1 && (
             <div className="flex justify-center items-center gap-2 mt-8">
               {Array.from({ length: projects.meta.lastPage }, (_, i) => i + 1).map((page) => (

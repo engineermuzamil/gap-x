@@ -1,4 +1,5 @@
-import { Head, useForm, Link, router, usePage } from '@inertiajs/react'
+import { Head, useForm, router, usePage } from '@inertiajs/react'
+import { Link } from '@adonisjs/inertia/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { PlusIcon, XIcon, ArrowLeft, LogOut } from 'lucide-react'
@@ -7,7 +8,6 @@ import NoteForm from './note-form'
 import ViewSwitcher from './view-switcher'
 import SortSelector from './sort-selector'
 import TrashSection from './trash-section'
-import FlashToast from './flash-toast'
 import { sortNotes } from '../../lib/sort-notes'
 import type { SortOption, Note, Label } from '../../lib/types'
 
@@ -115,7 +115,6 @@ export default function Index() {
       <Head title="Notes" />
       <div className="min-h-screen bg-[#1C1C1E] text-white">
         <div className="max-w-4xl mx-auto p-6">
-          <FlashToast />
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}

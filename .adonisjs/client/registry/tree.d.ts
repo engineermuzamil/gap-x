@@ -39,6 +39,14 @@ export interface ApiDefinition {
     update: typeof routes['todos.update']
     destroy: typeof routes['todos.destroy']
   }
+  projectsAuth: {
+    page: typeof routes['projectsAuth.page']
+    google: {
+      redirect: typeof routes['projectsAuth.google.redirect']
+      callback: typeof routes['projectsAuth.google.callback']
+    }
+    logout: typeof routes['projectsAuth.logout']
+  }
   projects: {
     index: typeof routes['projects.index']
     store: typeof routes['projects.store']

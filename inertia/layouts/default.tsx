@@ -6,7 +6,13 @@ import { ReactElement, useEffect } from 'react'
 export default function Layout({ children }: { children: ReactElement<Data.SharedProps> }) {
   const page = usePage()
   const flash = children.props.flash
-  const isGuestAuthPage = page.url === '/login' || page.url === '/signup'
+  const path = page.url.split('?')[0]
+  const isGuestAuthPage =
+    path === '/login' ||
+    path === '/signup' ||
+    path === '/projects/auth' ||
+    path === '/projects/auth/login' ||
+    path === '/projects/auth/signup'
   const shouldShowError =
     !!flash.error && !(isGuestAuthPage && flash.error.toLowerCase().includes('unauthorized'))
 

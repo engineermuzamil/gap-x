@@ -31,6 +31,10 @@ export type ScannedRoutes = {
     'todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'projectsAuth.page': { paramsTuple?: []; params?: {} }
+    'projectsAuth.google.redirect': { paramsTuple?: []; params?: {} }
+    'projectsAuth.google.callback': { paramsTuple?: []; params?: {} }
+    'projectsAuth.logout': { paramsTuple?: []; params?: {} }
     'projects.index': { paramsTuple?: []; params?: {} }
     'projects.store': { paramsTuple?: []; params?: {} }
     'projects.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -47,6 +51,9 @@ export type ScannedRoutes = {
     'todos.page': { paramsTuple?: []; params?: {} }
     'todos.index': { paramsTuple?: []; params?: {} }
     'todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'projectsAuth.page': { paramsTuple?: []; params?: {} }
+    'projectsAuth.google.redirect': { paramsTuple?: []; params?: {} }
+    'projectsAuth.google.callback': { paramsTuple?: []; params?: {} }
     'projects.index': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
@@ -60,6 +67,9 @@ export type ScannedRoutes = {
     'todos.page': { paramsTuple?: []; params?: {} }
     'todos.index': { paramsTuple?: []; params?: {} }
     'todos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'projectsAuth.page': { paramsTuple?: []; params?: {} }
+    'projectsAuth.google.redirect': { paramsTuple?: []; params?: {} }
+    'projectsAuth.google.callback': { paramsTuple?: []; params?: {} }
     'projects.index': { paramsTuple?: []; params?: {} }
   }
   POST: {
@@ -74,6 +84,7 @@ export type ScannedRoutes = {
     'notes.upload': { paramsTuple?: []; params?: {} }
     'notes.share': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'todos.store': { paramsTuple?: []; params?: {} }
+    'projectsAuth.logout': { paramsTuple?: []; params?: {} }
     'projects.store': { paramsTuple?: []; params?: {} }
   }
   PUT: {

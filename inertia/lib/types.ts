@@ -63,3 +63,13 @@ export interface PaginatedProjects {
     total: number
   }
 }
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+
+/** The logged-in user passed from ProjectsController → Inertia page props. */
+export interface AuthUser {
+  id: number
+  fullName: string | null
+  email: string
+  avatarUrl: string | null
+}

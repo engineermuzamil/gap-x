@@ -22,8 +22,6 @@ router
   .use(middleware.auth())
 
 // ─── JWT-based Auth (Todos) ───────────────────────────────────────────────────
-// GET routes render the React pages via Inertia.
-// POST routes are JSON API endpoints that return a token.
 
 router
   .group(() => {
@@ -64,7 +62,6 @@ router
   .use(middleware.auth())
 
 // ─── Todos ────────────────────────────────────────────────────────────────────
-// The page shell is public. Data endpoints are JWT protected.
 
 router.get('/todos', ({ inertia }) => inertia.render('todos/index', {})).as('todos.page')
 
@@ -80,7 +77,21 @@ router
   .as('todos')
   .use(middleware.jwtAuth())
 
-// ─── Projects ─────────────────────────────────────────────────────────────────
+// ─── Projects – Google OAuth ──────────────────────────────────────────────────
+
+router
+  .group(() => {
+    router.get('/', [controllers.GoogleAuths, 'authPage']).as('page')
+
+    router.get('google/redirect', [controllers.GoogleAuths, 'redirect']).as('google.redirect')
+    router.get('google/callback', [controllers.GoogleAuths, 'callback']).as('google.callback')
+
+    router.post('logout', [controllers.GoogleAuths, 'logout']).as('logout').use(middleware.auth())
+  })
+  .prefix('/projects/auth')
+  .as('projectsAuth')
+
+// ─── Projects – Protected CRUD ────────────────────────────────────────────────
 
 router
   .group(() => {
@@ -91,3 +102,4 @@ router
   })
   .prefix('/projects')
   .as('projects')
+  .use(middleware.auth({ redirectTo: '/projects/auth' }))

@@ -168,6 +168,30 @@ const routes = {
     tokens: [{"old":"/todos/:id","type":0,"val":"todos","end":""},{"old":"/todos/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['todos.destroy']['types'],
   },
+  'projectsAuth.page': {
+    methods: ["GET","HEAD"],
+    pattern: '/projects/auth',
+    tokens: [{"old":"/projects/auth","type":0,"val":"projects","end":""},{"old":"/projects/auth","type":0,"val":"auth","end":""}],
+    types: placeholder as Registry['projectsAuth.page']['types'],
+  },
+  'projectsAuth.google.redirect': {
+    methods: ["GET","HEAD"],
+    pattern: '/projects/auth/google/redirect',
+    tokens: [{"old":"/projects/auth/google/redirect","type":0,"val":"projects","end":""},{"old":"/projects/auth/google/redirect","type":0,"val":"auth","end":""},{"old":"/projects/auth/google/redirect","type":0,"val":"google","end":""},{"old":"/projects/auth/google/redirect","type":0,"val":"redirect","end":""}],
+    types: placeholder as Registry['projectsAuth.google.redirect']['types'],
+  },
+  'projectsAuth.google.callback': {
+    methods: ["GET","HEAD"],
+    pattern: '/projects/auth/google/callback',
+    tokens: [{"old":"/projects/auth/google/callback","type":0,"val":"projects","end":""},{"old":"/projects/auth/google/callback","type":0,"val":"auth","end":""},{"old":"/projects/auth/google/callback","type":0,"val":"google","end":""},{"old":"/projects/auth/google/callback","type":0,"val":"callback","end":""}],
+    types: placeholder as Registry['projectsAuth.google.callback']['types'],
+  },
+  'projectsAuth.logout': {
+    methods: ["POST"],
+    pattern: '/projects/auth/logout',
+    tokens: [{"old":"/projects/auth/logout","type":0,"val":"projects","end":""},{"old":"/projects/auth/logout","type":0,"val":"auth","end":""},{"old":"/projects/auth/logout","type":0,"val":"logout","end":""}],
+    types: placeholder as Registry['projectsAuth.logout']['types'],
+  },
   'projects.index': {
     methods: ["GET","HEAD"],
     pattern: '/projects',

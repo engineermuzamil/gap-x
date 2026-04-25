@@ -331,6 +331,54 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/todos_controller').default['destroy']>>>
     }
   }
+  'projectsAuth.page': {
+    methods: ["GET","HEAD"]
+    pattern: '/projects/auth'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['authPage']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['authPage']>>>
+    }
+  }
+  'projectsAuth.google.redirect': {
+    methods: ["GET","HEAD"]
+    pattern: '/projects/auth/google/redirect'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['redirect']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['redirect']>>>
+    }
+  }
+  'projectsAuth.google.callback': {
+    methods: ["GET","HEAD"]
+    pattern: '/projects/auth/google/callback'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['callback']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['callback']>>>
+    }
+  }
+  'projectsAuth.logout': {
+    methods: ["POST"]
+    pattern: '/projects/auth/logout'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['logout']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/google_auths_controller').default['logout']>>>
+    }
+  }
   'projects.index': {
     methods: ["GET","HEAD"]
     pattern: '/projects'
