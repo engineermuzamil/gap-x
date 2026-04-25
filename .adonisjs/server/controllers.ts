@@ -4,11 +4,11 @@
  */
 
 export const controllers = {
-  GoogleAuths: () => import('#controllers/google_auths_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Notes: () => import('#controllers/notes_controller'),
   Projects: () => import('#controllers/projects_controller'),
   Session: () => import('#controllers/session_controller'),
-  TodoAuths: () => import('#controllers/todo_auths_controller'),
   Todos: () => import('#controllers/todos_controller'),
+  GoogleAuths: () => import('#controllers/google_auths_controller'),
+  TodoAuths: () => import('#controllers/todo_auths_controller'),
 }
