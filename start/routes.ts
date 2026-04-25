@@ -103,3 +103,6 @@ router
   .prefix('/projects')
   .as('projects')
   .use(middleware.auth({ redirectTo: '/projects/auth' }))
+
+// - Weather - API -----------------------------------------------------------
+router.get('/weather', [controllers.Weather, 'show']).as('weather.show')

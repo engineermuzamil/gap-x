@@ -427,4 +427,16 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/projects_controller').default['destroy']>>>
     }
   }
+  'weather.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/weather'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/weather_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/weather_controller').default['show']>>>
+    }
+  }
 }

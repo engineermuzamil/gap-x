@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react'
 import { Link } from '@inertiajs/react'
+import WeatherCard from '../pages/weather/index'
 
 export default function Home() {
   return (
@@ -41,6 +42,9 @@ export default function Home() {
 
             {/* Cards Container */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full">
+              {/* Weather Card — fetches from our /weather route automatically */}
+              <WeatherCard />
+
               {/* Notes Card */}
               <Link href="/notes" className="block">
                 <div className="bg-[#2C2C2E] p-6 rounded-xl hover:bg-[#3C3C3E] transition-colors duration-200">

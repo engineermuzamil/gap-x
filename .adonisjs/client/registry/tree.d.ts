@@ -53,4 +53,7 @@ export interface ApiDefinition {
     update: typeof routes['projects.update']
     destroy: typeof routes['projects.destroy']
   }
+  weather: {
+    show: typeof routes['weather.show']
+  }
 }

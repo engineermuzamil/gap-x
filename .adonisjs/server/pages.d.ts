@@ -24,16 +24,17 @@ declare module '@adonisjs/inertia/types' {
     'notes/sort-selector': ExtractProps<(typeof import('../../inertia/pages/notes/sort-selector.tsx'))['default']>
     'notes/trash-section': ExtractProps<(typeof import('../../inertia/pages/notes/trash-section.tsx'))['default']>
     'notes/view-switcher': ExtractProps<(typeof import('../../inertia/pages/notes/view-switcher.tsx'))['default']>
+    'projects/auth': ExtractProps<(typeof import('../../inertia/pages/projects/auth.tsx'))['default']>
     'projects/index': ExtractProps<(typeof import('../../inertia/pages/projects/index.tsx'))['default']>
     'projects/project-card': ExtractProps<(typeof import('../../inertia/pages/projects/project-card.tsx'))['default']>
     'projects/project-form': ExtractProps<(typeof import('../../inertia/pages/projects/project-form.tsx'))['default']>
     'projects/view-switcher': ExtractProps<(typeof import('../../inertia/pages/projects/view-switcher.tsx'))['default']>
     'todos/index': ExtractProps<(typeof import('../../inertia/pages/todos/index.tsx'))['default']>
+    'todos/login': ExtractProps<(typeof import('../../inertia/pages/todos/login.tsx'))['default']>
+    'todos/signup': ExtractProps<(typeof import('../../inertia/pages/todos/signup.tsx'))['default']>
     'todos/todo-card': ExtractProps<(typeof import('../../inertia/pages/todos/todo-card.tsx'))['default']>
     'todos/todo-form': ExtractProps<(typeof import('../../inertia/pages/todos/todo-form.tsx'))['default']>
     'todos/view-switcher': ExtractProps<(typeof import('../../inertia/pages/todos/view-switcher.tsx'))['default']>
-    'todos/login': ExtractProps<(typeof import('../../inertia/pages/todos/login.tsx'))['default']>
-    'todos/signup': ExtractProps<(typeof import('../../inertia/pages/todos/signup.tsx'))['default']>
-    'projects/auth': ExtractProps<(typeof import('../../inertia/pages/projects/auth.tsx'))['default']>
+    'weather/index': ExtractProps<(typeof import('../../inertia/pages/weather/index.tsx'))['default']>
   }
 }
