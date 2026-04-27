@@ -18,6 +18,7 @@ export default defineConfig({
     alias: {
       '~/': `${import.meta.dirname}/inertia/`,
       '@generated': `${import.meta.dirname}/.adonisjs/client/`,
+      '@': `${import.meta.dirname}/inertia`, // Added for ShadCN import alias
     },
   },
 
@@ -25,5 +26,17 @@ export default defineConfig({
     watch: {
       ignored: ['**/storage/**', '**/tmp/**'],
     },
+  },
+
+  build: {
+    target: 'ES2020',
+  },
+
+  esbuild: {
+    target: 'ES2020',
+  },
+
+  define: {
+    'process.env.SWC_BASE_URL': JSON.stringify(import.meta.dirname),
   },
 })

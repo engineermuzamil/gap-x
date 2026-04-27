@@ -8,6 +8,8 @@ import TodoForm from './todo-form'
 import ViewSwitcher from '../notes/view-switcher'
 import type { Todo, Label } from '../../lib/types'
 import { authHeaders, getToken, logoutFromTodos } from '../../lib/todo-auth'
+// ── ShadCN components ────────────────────────────────────────────────────────
+import { Button } from '../../components/ui/button'
 
 type ViewType = 'grid' | 'list'
 type TodoUser = {
@@ -33,7 +35,6 @@ export default function Index() {
       router.visit('/todo-auth/login')
       return
     }
-
     void fetchTodos()
   }, [])
 
@@ -51,7 +52,6 @@ export default function Index() {
         router.visit('/todo-auth/login')
         return
       }
-
       setError('Failed to load todos.')
     } finally {
       setLoading(false)
@@ -75,15 +75,11 @@ export default function Index() {
         const response = await axios.put(`/todos/${editingTodo.id}`, data, {
           headers: authHeaders(),
         })
-
         setTodos((current) =>
           current.map((todo) => (todo.id === editingTodo.id ? response.data : todo))
         )
       } else {
-        const response = await axios.post('/todos', data, {
-          headers: authHeaders(),
-        })
-
+        const response = await axios.post('/todos', data, { headers: authHeaders() })
         setTodos((current) => [response.data, ...current])
       }
 
@@ -96,7 +92,6 @@ export default function Index() {
         router.visit('/todo-auth/login')
         return
       }
-
       setError(editingTodo ? 'Failed to update todo.' : 'Failed to create todo.')
     } finally {
       setSubmitting(false)
@@ -124,7 +119,6 @@ export default function Index() {
         router.visit('/todo-auth/login')
         return
       }
-
       setError('Failed to delete todo.')
     }
   }
@@ -141,7 +135,6 @@ export default function Index() {
         },
         { headers: authHeaders() }
       )
-
       setTodos((current) => current.map((item) => (item.id === todo.id ? response.data : item)))
     } catch (err: any) {
       if (err.response?.status === 401) {
@@ -149,7 +142,6 @@ export default function Index() {
         router.visit('/todo-auth/login')
         return
       }
-
       setError('Failed to update todo.')
     }
   }
@@ -178,18 +170,21 @@ export default function Index() {
       <Head title="Todos" />
       <div className="min-h-screen bg-[#1C1C1E] text-white">
         <div className="max-w-4xl mx-auto p-6">
+          {/* ── Error banner ─────────────────────────────────────────────── */}
           {error && (
             <div className="mb-4 px-4 py-3 rounded-xl bg-[#FF6B6B]/10 border border-[#FF6B6B]/30 text-sm text-[#FF6B6B]">
               {error}
             </div>
           )}
 
+          {/* ── Header ─────────────────────────────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
           >
             <div className="flex items-center gap-3">
+              {/* ShadCN Button variant="ghost" replaces raw Link+ArrowLeft */}
               <Link
                 href="/"
                 className="p-2 hover:bg-[#2C2C2E] rounded-full transition-colors duration-200"
@@ -200,6 +195,7 @@ export default function Index() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3 md:justify-end">
+              {/* ── User pill ── */}
               {user && (
                 <div className="flex items-center gap-3 rounded-full border border-[#3A3A3C] bg-[#2C2C2E] px-3 py-2">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0A84FF]/15 text-sm font-semibold text-[#7DB7FF]">
@@ -209,28 +205,35 @@ export default function Index() {
                     <p className="truncate text-sm font-medium">{user.fullName || 'Todos User'}</p>
                     <p className="truncate text-xs text-[#98989D]">{user.email}</p>
                   </div>
-                  <button
+                  {/* ShadCN Button replaces raw logout button */}
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
                     onClick={handleLogout}
-                    className="rounded-full p-2 text-[#98989D] transition-colors hover:bg-[#3A3A3C] hover:text-white"
                     title="Log out"
+                    className="rounded-full text-[#98989D] hover:bg-[#3A3A3C] hover:text-white h-8 w-8"
                   >
                     <LogOut size={16} />
-                  </button>
+                  </Button>
                 </div>
               )}
+
               <ViewSwitcher currentView={viewType} onChange={setViewType} />
 
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={handleToggleForm}
-                className="bg-[#0A84FF] text-white p-3 rounded-full shadow-lg hover:bg-[#0A74FF] transition-colors duration-200"
-              >
-                {isFormVisible ? <XIcon size={20} /> : <PlusIcon size={20} />}
-              </motion.button>
+              {/* ShadCN Button replaces raw motion.button for + toggle */}
+              <motion.div whileTap={{ scale: 0.95 }}>
+                <Button
+                  onClick={handleToggleForm}
+                  className="bg-[#0A84FF] hover:bg-[#0A74FF] text-white p-3 rounded-full shadow-lg h-auto w-auto"
+                >
+                  {isFormVisible ? <XIcon size={20} /> : <PlusIcon size={20} />}
+                </Button>
+              </motion.div>
             </div>
           </motion.div>
 
+          {/* ── Todo Form ──────────────────────────────────────────────────── */}
           <AnimatePresence>
             {isFormVisible && (
               <motion.div
@@ -253,6 +256,7 @@ export default function Index() {
             )}
           </AnimatePresence>
 
+          {/* ── Content ────────────────────────────────────────────────────── */}
           {loading ? (
             <div className="text-center text-[#98989D] py-12">Loading...</div>
           ) : !todos.length ? (

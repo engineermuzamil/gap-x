@@ -3,7 +3,12 @@
   "compilerOptions": {
     "rootDir": "./",
     "jsx": "react",
-    "outDir": "./build"
+    "outDir": "./build",
+    // Added for ShadCN import alias
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./inertia/*"]
+    }
   },
   "references": [{ "path": "./tsconfig.inertia.json" }]
 }
