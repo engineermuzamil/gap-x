@@ -8,7 +8,10 @@ import NoteForm from './note-form'
 import ViewSwitcher from './view-switcher'
 import SortSelector from './sort-selector'
 import TrashSection from './trash-section'
+import LabelFilter from './label-filter'
 import { sortNotes } from '../../lib/sort-notes'
+// ── Zustand store — replaces local useState for persistent UI state ────────
+import { useNotesStore } from '../../lib/notes-store'
 import type { SortOption, Note, Label } from '../../lib/types'
 
 type ViewType = 'grid' | 'list'
@@ -18,17 +21,23 @@ export default function Index() {
     notes: Note[]
     trashedNotes: Note[]
     labels: Label[]
-    user?: {
-      fullName: string | null
-      email: string
-      initials: string
-    }
+    user?: { fullName: string | null; email: string; initials: string }
   }>().props
 
-  const [isFormVisible, setIsFormVisible] = useState(false)
+  // ── Zustand replaces useState for viewType, sortBy, isFormVisible ─────────
+  // These now persist across page navigations via localStorage
+  const {
+    viewType,
+    setViewType,
+    sortBy,
+    setSortBy,
+    isFormVisible,
+    setIsFormVisible,
+    activeLabels,
+  } = useNotesStore()
+
+  // editingNote stays local — only relevant during this render session
   const [editingNote, setEditingNote] = useState<Note | null>(null)
-  const [viewType, setViewType] = useState<ViewType>('grid')
-  const [sortBy, setSortBy] = useState<SortOption>('pinned')
 
   const { data, setData, post, put, processing, reset } = useForm({
     title: '',
@@ -39,7 +48,15 @@ export default function Index() {
     removeImage: false,
   })
 
-  const sortedNotes = sortNotes(notes, sortBy)
+  // ── Filter notes by active labels (client-side, instant, no server call) ──
+  // No filters active → show all notes
+  // Filters active → show notes that have AT LEAST ONE of the selected labels
+  const filteredNotes =
+    activeLabels.length === 0
+      ? notes
+      : notes.filter((note) => note.labels.some((label) => activeLabels.includes(label.id)))
+
+  const sortedNotes = sortNotes(filteredNotes, sortBy)
   const pinnedNotes = sortedNotes.filter((n) => n.pinned)
   const unpinnedNotes = sortedNotes.filter((n) => !n.pinned)
 
@@ -76,9 +93,7 @@ export default function Index() {
     setIsFormVisible(true)
   }
 
-  const handleDelete = (id: number) => {
-    router.delete(`/notes/${id}`)
-  }
+  const handleDelete = (id: number) => router.delete(`/notes/${id}`)
 
   const handleTogglePin = (note: Note) => {
     router.put(`/notes/${note.id}`, {
@@ -93,28 +108,26 @@ export default function Index() {
   }
 
   const handleToggleForm = () => {
-    setIsFormVisible(!isFormVisible)
+    // Closing → reset form and clear editing state
     if (isFormVisible) {
       reset()
       setEditingNote(null)
     }
+    setIsFormVisible(!isFormVisible)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-      submit(e as any)
-    }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') submit(e as any)
   }
 
-  const handleLogout = () => {
-    router.post('/logout')
-  }
+  const handleLogout = () => router.post('/logout')
 
   return (
     <>
       <Head title="Notes" />
       <div className="min-h-screen bg-[#1C1C1E] text-white">
         <div className="max-w-4xl mx-auto p-6">
+          {/* ── Header ─────────────────────────────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -150,8 +163,10 @@ export default function Index() {
                   </button>
                 </div>
               )}
+
               <SortSelector value={sortBy} onChange={setSortBy} />
               <ViewSwitcher currentView={viewType} onChange={setViewType} />
+
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={handleToggleForm}
@@ -162,6 +177,7 @@ export default function Index() {
             </div>
           </motion.div>
 
+          {/* ── Note Form ──────────────────────────────────────────────────── */}
           <AnimatePresence>
             {isFormVisible && (
               <motion.div
@@ -185,15 +201,23 @@ export default function Index() {
             )}
           </AnimatePresence>
 
+          {/* ── Label Filter chips — powered by Zustand ────────────────────── */}
+          <LabelFilter labels={labels} />
+
+          {/* ── Empty state ────────────────────────────────────────────────── */}
           {!sortedNotes.length ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="rounded-2xl border border-dashed border-[#3A3A3C] bg-[#232325] px-6 py-12 text-center"
             >
-              <h2 className="text-xl font-semibold">No notes yet</h2>
+              <h2 className="text-xl font-semibold">
+                {activeLabels.length > 0 ? 'No notes match this filter' : 'No notes yet'}
+              </h2>
               <p className="mt-2 text-sm text-[#98989D]">
-                Hit the + button to add your first note.
+                {activeLabels.length > 0
+                  ? 'Try selecting different labels or clear the filter.'
+                  : 'Hit the + button to add your first note.'}
               </p>
             </motion.div>
           ) : (
