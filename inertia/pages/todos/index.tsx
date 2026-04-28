@@ -8,15 +8,10 @@ import TodoForm from './todo-form'
 import ViewSwitcher from '../notes/view-switcher'
 import type { Todo, Label } from '../../lib/types'
 import { authHeaders, getToken, logoutFromTodos } from '../../lib/todo-auth'
-// ── ShadCN components ────────────────────────────────────────────────────────
-import { Button } from '../../components/ui/button'
+import { Button } from '@/components/ui/button'
 
 type ViewType = 'grid' | 'list'
-type TodoUser = {
-  fullName: string | null
-  email: string
-  initials: string
-}
+type TodoUser = { fullName: string | null; email: string; initials: string }
 
 export default function Index() {
   const [todos, setTodos] = useState<Todo[]>([])
@@ -58,18 +53,20 @@ export default function Index() {
     }
   }
 
+  // ── Form state now includes priority + status ─────────────────────────────
   const { data, setData, reset } = useForm({
     title: '',
     description: '',
     isCompleted: false,
     labelIds: [] as number[],
+    priority: 'medium',
+    status: 'pending',
   })
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSubmitting(true)
     setError(null)
-
     try {
       if (editingTodo) {
         const response = await axios.put(`/todos/${editingTodo.id}`, data, {
@@ -82,7 +79,6 @@ export default function Index() {
         const response = await axios.post('/todos', data, { headers: authHeaders() })
         setTodos((current) => [response.data, ...current])
       }
-
       reset()
       setEditingTodo(null)
       setIsFormVisible(false)
@@ -105,6 +101,9 @@ export default function Index() {
       description: todo.description ?? '',
       isCompleted: todo.isCompleted,
       labelIds: todo.labels.map((l) => l.id),
+      // Populate priority + status from existing todo
+      priority: todo.priority ?? 'medium',
+      status: todo.status ?? 'pending',
     })
     setIsFormVisible(true)
   }
@@ -125,13 +124,17 @@ export default function Index() {
 
   const handleToggleComplete = async (todo: Todo) => {
     try {
+      const nextIsCompleted = !todo.isCompleted
+
       const response = await axios.put(
         `/todos/${todo.id}`,
         {
           title: todo.title,
           description: todo.description,
-          isCompleted: !todo.isCompleted,
+          isCompleted: nextIsCompleted,
           labelIds: todo.labels.map((l) => l.id),
+          priority: todo.priority,
+          status: nextIsCompleted ? 'completed' : 'pending',
         },
         { headers: authHeaders() }
       )
@@ -155,9 +158,7 @@ export default function Index() {
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-      submit(e as any)
-    }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') submit(e as any)
   }
 
   const handleLogout = async () => {
@@ -170,7 +171,6 @@ export default function Index() {
       <Head title="Todos" />
       <div className="min-h-screen bg-[#1C1C1E] text-white">
         <div className="max-w-4xl mx-auto p-6">
-          {/* ── Error banner ─────────────────────────────────────────────── */}
           {error && (
             <div className="mb-4 px-4 py-3 rounded-xl bg-[#FF6B6B]/10 border border-[#FF6B6B]/30 text-sm text-[#FF6B6B]">
               {error}
@@ -184,7 +184,6 @@ export default function Index() {
             className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
           >
             <div className="flex items-center gap-3">
-              {/* ShadCN Button variant="ghost" replaces raw Link+ArrowLeft */}
               <Link
                 href="/"
                 className="p-2 hover:bg-[#2C2C2E] rounded-full transition-colors duration-200"
@@ -195,7 +194,6 @@ export default function Index() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3 md:justify-end">
-              {/* ── User pill ── */}
               {user && (
                 <div className="flex items-center gap-3 rounded-full border border-[#3A3A3C] bg-[#2C2C2E] px-3 py-2">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0A84FF]/15 text-sm font-semibold text-[#7DB7FF]">
@@ -205,7 +203,6 @@ export default function Index() {
                     <p className="truncate text-sm font-medium">{user.fullName || 'Todos User'}</p>
                     <p className="truncate text-xs text-[#98989D]">{user.email}</p>
                   </div>
-                  {/* ShadCN Button replaces raw logout button */}
                   <Button
                     type="button"
                     variant="ghost"
@@ -218,10 +215,7 @@ export default function Index() {
                   </Button>
                 </div>
               )}
-
               <ViewSwitcher currentView={viewType} onChange={setViewType} />
-
-              {/* ShadCN Button replaces raw motion.button for + toggle */}
               <motion.div whileTap={{ scale: 0.95 }}>
                 <Button
                   onClick={handleToggleForm}
@@ -233,7 +227,7 @@ export default function Index() {
             </div>
           </motion.div>
 
-          {/* ── Todo Form ──────────────────────────────────────────────────── */}
+          {/* ── Form ───────────────────────────────────────────────────────── */}
           <AnimatePresence>
             {isFormVisible && (
               <motion.div

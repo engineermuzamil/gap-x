@@ -2,13 +2,25 @@ import type React from 'react'
 import { motion } from 'framer-motion'
 import LabelPicker from '../../lib/label-picker'
 import type { Label } from '../../lib/types'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label as FormLabel } from '@/components/ui/label'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-import { Textarea } from '../../components/ui/textarea'
-import { Checkbox } from '../../components/ui/checkbox'
-import { Button } from '../../components/ui/button'
-import { Input } from '../../components/ui/input'
-import { Label as FormLabel } from '../../components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
+// Priority and status options — defined here so they're easy to update
+const PRIORITY_OPTIONS = [
+  { value: 'high', label: '🔴 High' },
+  { value: 'medium', label: '🟡 Medium' },
+  { value: 'low', label: '🟢 Low' },
+] as const
+
+const STATUS_OPTIONS = [
+  { value: 'pending', label: 'Pending' },
+  { value: 'in_progress', label: 'In Progress' },
+  { value: 'completed', label: 'Completed' },
+] as const
 
 interface TodoFormProps {
   data: {
@@ -16,6 +28,8 @@ interface TodoFormProps {
     description: string
     isCompleted: boolean
     labelIds: number[]
+    priority: string
+    status: string
   }
   setData: (field: string, value: any) => void
   submit: (e: React.FormEvent) => void
@@ -35,7 +49,6 @@ export default function TodoForm({
   allLabels,
 }: TodoFormProps) {
   return (
-    // ShadCN Card replaces raw motion.div with manual styles
     <Card className="bg-[#2C2C2E] border-[#3A3A3C]">
       <CardHeader>
         <CardTitle className="text-white text-xl">{isEditing ? 'Edit Todo' : 'New Todo'}</CardTitle>
@@ -43,9 +56,9 @@ export default function TodoForm({
 
       <CardContent>
         <form onSubmit={submit} className="space-y-4">
+          {/* Title */}
           <div className="space-y-1.5">
             <FormLabel className="text-[#98989D]">Title</FormLabel>
-            {/* ShadCN Input replaces raw input */}
             <Input
               type="text"
               value={data.title}
@@ -56,25 +69,61 @@ export default function TodoForm({
             />
           </div>
 
+          {/* Description */}
           <div className="space-y-1.5">
             <FormLabel className="text-[#98989D]">Description</FormLabel>
-            {/* ShadCN Textarea replaces raw textarea */}
             <Textarea
               value={data.description}
               onChange={(e) => setData('description', e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Todo description (optional)"
-              className="bg-[#3A3A3C] border-none text-white placeholder:text-[#98989D] focus-visible:ring-[#0A84FF] min-h-[120px]"
+              className="bg-[#3A3A3C] border-none text-white placeholder:text-[#98989D] focus-visible:ring-[#0A84FF] min-h-[100px]"
             />
           </div>
 
+          {/* Priority + Status side by side */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Priority select */}
+            <div className="space-y-1.5">
+              <FormLabel className="text-[#98989D]">Priority</FormLabel>
+              <select
+                value={data.priority}
+                onChange={(e) => setData('priority', e.target.value)}
+                className="w-full px-3 py-2 bg-[#3A3A3C] text-white text-sm rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-[#0A84FF] cursor-pointer"
+              >
+                {PRIORITY_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Status select */}
+            <div className="space-y-1.5">
+              <FormLabel className="text-[#98989D]">Status</FormLabel>
+              <select
+                value={data.status}
+                onChange={(e) => setData('status', e.target.value)}
+                className="w-full px-3 py-2 bg-[#3A3A3C] text-white text-sm rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-[#0A84FF] cursor-pointer"
+              >
+                {STATUS_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Labels */}
           <LabelPicker
             allLabels={allLabels}
             selectedIds={data.labelIds}
             onChange={(ids) => setData('labelIds', ids)}
           />
 
-          {/* ShadCN Checkbox + Label pair — must use htmlFor/id to link them */}
+          {/* Completed checkbox */}
           <div className="flex items-center gap-3">
             <Checkbox
               id="isCompleted"
@@ -87,7 +136,7 @@ export default function TodoForm({
             </FormLabel>
           </div>
 
-          {/* ShadCN Button replaces raw button */}
+          {/* Submit */}
           <Button
             type="submit"
             disabled={processing}

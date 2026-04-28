@@ -48,10 +48,16 @@ export default class TodosController {
    * Creates a new todo owned by the authenticated user.
    */
   async store({ request, response, jwtUser }: HttpContext) {
-    const data = request.only(['title', 'description', 'isCompleted'])
+    // Added priority and status to the picked fields
+    const data = request.only(['title', 'description', 'isCompleted', 'priority', 'status'])
     const labelIds: number[] = request.input('labelIds', [])
 
-    const todo = await Todo.create({ ...data, userId: jwtUser.userId })
+    const todo = await Todo.create({
+      ...data,
+      priority: data.priority ?? 'medium',
+      status: data.status ?? 'pending',
+      userId: jwtUser.userId,
+    })
 
     if (labelIds.length > 0) {
       await todo.related('labels').attach(labelIds)
@@ -74,7 +80,8 @@ export default class TodosController {
 
     if (!todo) return response.notFound({ message: 'Todo not found' })
 
-    const data = request.only(['title', 'description', 'isCompleted'])
+    // Added priority and status to the picked fields
+    const data = request.only(['title', 'description', 'isCompleted', 'priority', 'status'])
     const labelIds: number[] = request.input('labelIds', [])
 
     await todo.merge(data).save()

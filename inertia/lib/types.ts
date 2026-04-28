@@ -30,17 +30,17 @@ export type SortOption = 'pinned' | 'created_desc' | 'created_asc' | 'updated_de
 
 // ─── Todo ─────────────────────────────────────────────────────────────────────
 
-export interface Todo {
+export type Todo = {
   id: number
-  userId: number
   title: string
   description: string | null
   isCompleted: boolean
+  priority: 'high' | 'medium' | 'low'
+  status: 'pending' | 'in_progress' | 'completed'
   labels: Label[]
   createdAt: string
-  updatedAt: string
+  updatedAt: string | null
 }
-
 // ─── Project ──────────────────────────────────────────────────────────────────
 
 export interface Project {
