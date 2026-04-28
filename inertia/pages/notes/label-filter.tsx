@@ -10,7 +10,6 @@ interface LabelFilterProps {
 export default function LabelFilter({ labels }: LabelFilterProps) {
   const { activeLabels, toggleLabel, clearLabels } = useNotesStore()
 
-  // Nothing to show if no labels exist
   if (!labels.length) return null
 
   return (
@@ -20,7 +19,6 @@ export default function LabelFilter({ labels }: LabelFilterProps) {
       {labels.map((label) => {
         const isActive = activeLabels.includes(label.id)
         const { bg, text } = getLabelColor(label.name)
-
         return (
           <button
             key={label.id}
@@ -29,11 +27,7 @@ export default function LabelFilter({ labels }: LabelFilterProps) {
             className={`
               text-xs px-2.5 py-0.5 rounded-full transition-all duration-200 cursor-pointer
               ${bg} ${text}
-              ${
-                isActive
-                  ? 'opacity-100 ring-2 ring-white/20 scale-105'
-                  : 'opacity-40 hover:opacity-70'
-              }
+              ${isActive ? 'opacity-100 ring-2 ring-white/20 scale-105' : 'opacity-40 hover:opacity-70'}
             `}
           >
             {label.name}
@@ -41,7 +35,6 @@ export default function LabelFilter({ labels }: LabelFilterProps) {
         )
       })}
 
-      {/* Clear button — only shown when filters are active */}
       {activeLabels.length > 0 && (
         <button
           type="button"

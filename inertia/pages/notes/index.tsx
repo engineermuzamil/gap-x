@@ -9,8 +9,8 @@ import ViewSwitcher from './view-switcher'
 import SortSelector from './sort-selector'
 import TrashSection from './trash-section'
 import LabelFilter from './label-filter'
+import NoteSearchBar from './note-search-bar'
 import { sortNotes } from '../../lib/sort-notes'
-// ── Zustand store — replaces local useState for persistent UI state ────────
 import { useNotesStore } from '../../lib/notes-store'
 import type { SortOption, Note, Label } from '../../lib/types'
 
@@ -24,8 +24,6 @@ export default function Index() {
     user?: { fullName: string | null; email: string; initials: string }
   }>().props
 
-  // ── Zustand replaces useState for viewType, sortBy, isFormVisible ─────────
-  // These now persist across page navigations via localStorage
   const {
     viewType,
     setViewType,
@@ -34,9 +32,10 @@ export default function Index() {
     isFormVisible,
     setIsFormVisible,
     activeLabels,
+    searchQuery,
+    clearAll,
   } = useNotesStore()
 
-  // editingNote stays local — only relevant during this render session
   const [editingNote, setEditingNote] = useState<Note | null>(null)
 
   const { data, setData, post, put, processing, reset } = useForm({
@@ -48,17 +47,25 @@ export default function Index() {
     removeImage: false,
   })
 
-  // ── Filter notes by active labels (client-side, instant, no server call) ──
-  // No filters active → show all notes
-  // Filters active → show notes that have AT LEAST ONE of the selected labels
-  const filteredNotes =
+  const afterLabelFilter =
     activeLabels.length === 0
       ? notes
       : notes.filter((note) => note.labels.some((label) => activeLabels.includes(label.id)))
 
-  const sortedNotes = sortNotes(filteredNotes, sortBy)
+  const afterSearch =
+    searchQuery.trim() === ''
+      ? afterLabelFilter
+      : afterLabelFilter.filter((note) => {
+          const q = searchQuery.toLowerCase()
+          return note.title.toLowerCase().includes(q) || note.content.toLowerCase().includes(q)
+        })
+
+  const sortedNotes = sortNotes(afterSearch, sortBy)
   const pinnedNotes = sortedNotes.filter((n) => n.pinned)
   const unpinnedNotes = sortedNotes.filter((n) => !n.pinned)
+
+  // True when any filter/search is active — used for empty state message
+  const hasActiveFilters = activeLabels.length > 0 || searchQuery.trim() !== ''
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -108,7 +115,6 @@ export default function Index() {
   }
 
   const handleToggleForm = () => {
-    // Closing → reset form and clear editing state
     if (isFormVisible) {
       reset()
       setEditingNote(null)
@@ -163,10 +169,8 @@ export default function Index() {
                   </button>
                 </div>
               )}
-
               <SortSelector value={sortBy} onChange={setSortBy} />
               <ViewSwitcher currentView={viewType} onChange={setViewType} />
-
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={handleToggleForm}
@@ -201,8 +205,24 @@ export default function Index() {
             )}
           </AnimatePresence>
 
-          {/* ── Label Filter chips — powered by Zustand ────────────────────── */}
+          {/* ── Search bar ─────────────────────────────────────────────────── */}
+          <NoteSearchBar />
+
+          {/* ── Label filter chips ─────────────────────────────────────────── */}
           <LabelFilter labels={labels} />
+
+          {/* ── Clear all button — shown when both search + labels are active── */}
+          {activeLabels.length > 0 && searchQuery.trim() !== '' && (
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={clearAll}
+                className="text-xs text-[#98989D] hover:text-white transition-colors underline underline-offset-2"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
 
           {/* ── Empty state ────────────────────────────────────────────────── */}
           {!sortedNotes.length ? (
@@ -212,17 +232,17 @@ export default function Index() {
               className="rounded-2xl border border-dashed border-[#3A3A3C] bg-[#232325] px-6 py-12 text-center"
             >
               <h2 className="text-xl font-semibold">
-                {activeLabels.length > 0 ? 'No notes match this filter' : 'No notes yet'}
+                {hasActiveFilters ? 'No notes match' : 'No notes yet'}
               </h2>
               <p className="mt-2 text-sm text-[#98989D]">
-                {activeLabels.length > 0
-                  ? 'Try selecting different labels or clear the filter.'
+                {hasActiveFilters
+                  ? 'Try a different search or clear the filters.'
                   : 'Hit the + button to add your first note.'}
               </p>
             </motion.div>
           ) : (
             <div className="space-y-6">
-              {/* Pinned section */}
+              {/* Pinned */}
               {pinnedNotes.length > 0 && (
                 <section>
                   <div className="flex items-center gap-3 mb-3">
@@ -260,7 +280,7 @@ export default function Index() {
                 </section>
               )}
 
-              {/* Unpinned section */}
+              {/* Unpinned */}
               {unpinnedNotes.length > 0 && (
                 <div
                   className={
@@ -291,7 +311,6 @@ export default function Index() {
             </div>
           )}
 
-          {/* Trash — always at the bottom, collapsed by default */}
           <TrashSection trashedNotes={trashedNotes} />
         </div>
       </div>
