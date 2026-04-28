@@ -4,13 +4,6 @@ import type { BelongsTo, ManyToMany } from '@adonisjs/lucid/types/relations'
 import User from '#models/user'
 import Label from '#models/label'
 
-// Typed constants
-export const TODO_PRIORITIES = ['high', 'medium', 'low'] as const
-export const TODO_STATUSES = ['pending', 'in_progress', 'completed'] as const
-
-export type TodoPriority = (typeof TODO_PRIORITIES)[number]
-export type TodoStatus = (typeof TODO_STATUSES)[number]
-
 export default class Todo extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
@@ -25,13 +18,10 @@ export default class Todo extends BaseModel {
   declare description: string | null
 
   @column()
-  declare isCompleted: boolean
+  declare priority: string
 
   @column()
-  declare priority: TodoPriority
-
-  @column()
-  declare status: TodoStatus
+  declare status: string
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

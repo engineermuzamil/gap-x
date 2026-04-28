@@ -1,63 +1,38 @@
 import { Head, useForm, Link, router } from '@inertiajs/react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { PlusIcon, XIcon, ArrowLeft, LogOut } from 'lucide-react'
-import axios from 'axios'
 import TodoCard from './todo-card'
 import TodoForm from './todo-form'
 import ViewSwitcher from '../notes/view-switcher'
-import type { Todo, Label } from '../../lib/types'
-import { authHeaders, getToken, logoutFromTodos } from '../../lib/todo-auth'
+import type { Todo } from '../../lib/types'
+import { logoutFromTodos } from '../../lib/todo-auth'
 import { Button } from '@/components/ui/button'
+import { useTodos } from '../../lib/use-todos'
 
 type ViewType = 'grid' | 'list'
-type TodoUser = { fullName: string | null; email: string; initials: string }
 
 export default function Index() {
-  const [todos, setTodos] = useState<Todo[]>([])
-  const [labels, setLabels] = useState<Label[]>([])
-  const [user, setUser] = useState<TodoUser | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const {
+    todos,
+    labels,
+    user,
+    loading,
+    error,
+    submitting,
+    createTodo,
+    updateTodo,
+    deleteTodo,
+    toggleComplete,
+  } = useTodos()
+
   const [isFormVisible, setIsFormVisible] = useState(false)
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
   const [viewType, setViewType] = useState<ViewType>('grid')
 
-  useEffect(() => {
-    const token = getToken()
-    if (!token) {
-      router.visit('/todo-auth/login')
-      return
-    }
-    void fetchTodos()
-  }, [])
-
-  const fetchTodos = async () => {
-    setLoading(true)
-    try {
-      const response = await axios.get('/todos/data', { headers: authHeaders() })
-      setTodos(response.data.todos)
-      setLabels(response.data.labels)
-      setUser(response.data.user)
-      setError(null)
-    } catch (err: any) {
-      if (err.response?.status === 401) {
-        await logoutFromTodos()
-        router.visit('/todo-auth/login')
-        return
-      }
-      setError('Failed to load todos.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // ── Form state now includes priority + status ─────────────────────────────
   const { data, setData, reset } = useForm({
     title: '',
     description: '',
-    isCompleted: false,
     labelIds: [] as number[],
     priority: 'medium',
     status: 'pending',
@@ -65,33 +40,14 @@ export default function Index() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitting(true)
-    setError(null)
-    try {
-      if (editingTodo) {
-        const response = await axios.put(`/todos/${editingTodo.id}`, data, {
-          headers: authHeaders(),
-        })
-        setTodos((current) =>
-          current.map((todo) => (todo.id === editingTodo.id ? response.data : todo))
-        )
-      } else {
-        const response = await axios.post('/todos', data, { headers: authHeaders() })
-        setTodos((current) => [response.data, ...current])
-      }
-      reset()
-      setEditingTodo(null)
-      setIsFormVisible(false)
-    } catch (err: any) {
-      if (err.response?.status === 401) {
-        await logoutFromTodos()
-        router.visit('/todo-auth/login')
-        return
-      }
-      setError(editingTodo ? 'Failed to update todo.' : 'Failed to create todo.')
-    } finally {
-      setSubmitting(false)
+    if (editingTodo) {
+      await updateTodo.mutateAsync({ id: editingTodo.id, input: data })
+    } else {
+      await createTodo.mutateAsync(data)
     }
+    reset()
+    setEditingTodo(null)
+    setIsFormVisible(false)
   }
 
   const handleEdit = (todo: Todo) => {
@@ -99,55 +55,14 @@ export default function Index() {
     setData({
       title: todo.title,
       description: todo.description ?? '',
-      isCompleted: todo.isCompleted,
       labelIds: todo.labels.map((l) => l.id),
-      // Populate priority + status from existing todo
       priority: todo.priority ?? 'medium',
       status: todo.status ?? 'pending',
     })
     setIsFormVisible(true)
   }
 
-  const handleDelete = async (id: number) => {
-    try {
-      await axios.delete(`/todos/${id}`, { headers: authHeaders() })
-      setTodos((current) => current.filter((todo) => todo.id !== id))
-    } catch (err: any) {
-      if (err.response?.status === 401) {
-        await logoutFromTodos()
-        router.visit('/todo-auth/login')
-        return
-      }
-      setError('Failed to delete todo.')
-    }
-  }
-
-  const handleToggleComplete = async (todo: Todo) => {
-    try {
-      const nextIsCompleted = !todo.isCompleted
-
-      const response = await axios.put(
-        `/todos/${todo.id}`,
-        {
-          title: todo.title,
-          description: todo.description,
-          isCompleted: nextIsCompleted,
-          labelIds: todo.labels.map((l) => l.id),
-          priority: todo.priority,
-          status: nextIsCompleted ? 'completed' : 'pending',
-        },
-        { headers: authHeaders() }
-      )
-      setTodos((current) => current.map((item) => (item.id === todo.id ? response.data : item)))
-    } catch (err: any) {
-      if (err.response?.status === 401) {
-        await logoutFromTodos()
-        router.visit('/todo-auth/login')
-        return
-      }
-      setError('Failed to update todo.')
-    }
-  }
+  const handleDelete = (id: number) => deleteTodo.mutate(id)
 
   const handleToggleForm = () => {
     setIsFormVisible(!isFormVisible)
@@ -177,7 +92,6 @@ export default function Index() {
             </div>
           )}
 
-          {/* ── Header ─────────────────────────────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -227,7 +141,6 @@ export default function Index() {
             </div>
           </motion.div>
 
-          {/* ── Form ───────────────────────────────────────────────────────── */}
           <AnimatePresence>
             {isFormVisible && (
               <motion.div
@@ -250,7 +163,6 @@ export default function Index() {
             )}
           </AnimatePresence>
 
-          {/* ── Content ────────────────────────────────────────────────────── */}
           {loading ? (
             <div className="text-center text-[#98989D] py-12">Loading...</div>
           ) : !todos.length ? (
@@ -287,7 +199,7 @@ export default function Index() {
                       viewType={viewType}
                       onEdit={handleEdit}
                       onDelete={handleDelete}
-                      onToggleComplete={handleToggleComplete}
+                      onToggleComplete={toggleComplete}
                     />
                   </motion.div>
                 ))}

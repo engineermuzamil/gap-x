@@ -1,15 +1,12 @@
 import type React from 'react'
-import { motion } from 'framer-motion'
 import LabelPicker from '../../lib/label-picker'
 import type { Label } from '../../lib/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Label as FormLabel } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-// Priority and status options — defined here so they're easy to update
 const PRIORITY_OPTIONS = [
   { value: 'high', label: '🔴 High' },
   { value: 'medium', label: '🟡 Medium' },
@@ -26,7 +23,6 @@ interface TodoFormProps {
   data: {
     title: string
     description: string
-    isCompleted: boolean
     labelIds: number[]
     priority: string
     status: string
@@ -56,7 +52,6 @@ export default function TodoForm({
 
       <CardContent>
         <form onSubmit={submit} className="space-y-4">
-          {/* Title */}
           <div className="space-y-1.5">
             <FormLabel className="text-[#98989D]">Title</FormLabel>
             <Input
@@ -69,7 +64,6 @@ export default function TodoForm({
             />
           </div>
 
-          {/* Description */}
           <div className="space-y-1.5">
             <FormLabel className="text-[#98989D]">Description</FormLabel>
             <Textarea
@@ -81,9 +75,7 @@ export default function TodoForm({
             />
           </div>
 
-          {/* Priority + Status side by side */}
           <div className="grid grid-cols-2 gap-3">
-            {/* Priority select */}
             <div className="space-y-1.5">
               <FormLabel className="text-[#98989D]">Priority</FormLabel>
               <select
@@ -99,7 +91,6 @@ export default function TodoForm({
               </select>
             </div>
 
-            {/* Status select */}
             <div className="space-y-1.5">
               <FormLabel className="text-[#98989D]">Status</FormLabel>
               <select
@@ -116,27 +107,12 @@ export default function TodoForm({
             </div>
           </div>
 
-          {/* Labels */}
           <LabelPicker
             allLabels={allLabels}
             selectedIds={data.labelIds}
             onChange={(ids) => setData('labelIds', ids)}
           />
 
-          {/* Completed checkbox */}
-          <div className="flex items-center gap-3">
-            <Checkbox
-              id="isCompleted"
-              checked={data.isCompleted}
-              onCheckedChange={(checked) => setData('isCompleted', checked)}
-              className="border-[#98989D] data-[state=checked]:bg-[#0A84FF] data-[state=checked]:border-[#0A84FF]"
-            />
-            <FormLabel htmlFor="isCompleted" className="text-sm text-[#98989D] cursor-pointer">
-              Mark as completed
-            </FormLabel>
-          </div>
-
-          {/* Submit */}
           <Button
             type="submit"
             disabled={processing}

@@ -87,7 +87,7 @@ export class TodoLabelSchema extends BaseModel {
 }
 
 export class TodoSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'isCompleted', 'priority', 'status', 'title', 'updatedAt', 'userId'] as const
+  static $columns = ['createdAt', 'description', 'id', 'priority', 'status', 'title', 'updatedAt', 'userId'] as const
   $columns = TodoSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -95,8 +95,6 @@ export class TodoSchema extends BaseModel {
   declare description: string | null
   @column({ isPrimary: true })
   declare id: number
-  @column()
-  declare isCompleted: boolean
   @column()
   declare priority: string
   @column()

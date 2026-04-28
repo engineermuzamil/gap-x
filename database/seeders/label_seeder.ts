@@ -6,7 +6,6 @@ export default class LabelSeeder extends BaseSeeder {
     await Label.createMany([
       { name: 'Work' },
       { name: 'Personal' },
-      { name: 'Urgent' },
       { name: 'Learning' },
       { name: 'Ideas' },
       { name: 'Health' },

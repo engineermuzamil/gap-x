@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { formatDistanceToNow } from 'date-fns'
-import { CheckCircle2, Circle, PencilIcon, Trash2, AlertCircle, Clock, Tag } from 'lucide-react'
+import { CheckCircle2, Circle, PencilIcon, Trash2, AlertCircle, Clock } from 'lucide-react'
 import { getLabelColor } from '../../lib/label-colors'
 import type { Todo } from '../../lib/types'
 import { Badge } from '@/components/ui/badge'
@@ -15,7 +15,6 @@ interface TodoCardProps {
   onToggleComplete: (todo: Todo) => void
 }
 
-// ── Priority — left border accent + icon + colored text ──────────────────────
 const PRIORITY_CONFIG = {
   high: {
     label: 'High',
@@ -37,7 +36,6 @@ const PRIORITY_CONFIG = {
   },
 } as const
 
-// ── Status — distinct shape: rounded-md instead of rounded-full ───────────────
 const STATUS_CONFIG = {
   pending: { label: 'Pending', bg: 'bg-[#3A3A3C]', text: 'text-[#98989D]' },
   in_progress: { label: 'In Progress', bg: 'bg-[#0A84FF]/15', text: 'text-[#0A84FF]' },
@@ -64,6 +62,9 @@ export default function TodoCard({
     PRIORITY_CONFIG[todo.priority as keyof typeof PRIORITY_CONFIG] ?? PRIORITY_CONFIG.medium
   const status = STATUS_CONFIG[todo.status as keyof typeof STATUS_CONFIG] ?? STATUS_CONFIG.pending
 
+  // Single source of truth — just status now, no isCompleted
+  const isDone = todo.status === 'completed'
+
   return (
     <motion.div
       whileHover={{ y: -2, scale: 1.01 }}
@@ -71,29 +72,28 @@ export default function TodoCard({
       transition={{ duration: 0.2 }}
       className={viewType === 'grid' ? 'h-full' : 'w-full'}
     >
-      {/* Left border accent color reflects priority — immediately visible */}
       <Card
         className={`bg-[#2C2C2E]/80 border-[#3A3A3C] border-l-4 ${priority.border} text-white overflow-hidden`}
       >
         <CardContent className={`p-5 ${viewType === 'list' ? 'flex items-start gap-4' : ''}`}>
           <div className={viewType === 'list' ? 'flex-1' : ''}>
-            {/* ── Title row ── */}
             <div className="flex justify-between items-start mb-3">
               <div className="flex items-start gap-3 flex-1">
                 <button
                   type="button"
                   onClick={() => onToggleComplete(todo)}
-                  className="mt-0.5 shrink-0"
+                  className="mt-0.5 shrink-0 transition-transform hover:scale-110"
+                  title={isDone ? 'Mark as pending' : 'Mark as completed'}
                 >
-                  {todo.isCompleted ? (
+                  {isDone ? (
                     <CheckCircle2 size={20} className="text-[#30D158]" />
                   ) : (
                     <Circle size={20} className="text-[#8E8E93]" />
                   )}
                 </button>
                 <h2
-                  className={`text-base font-medium leading-snug ${
-                    todo.isCompleted ? 'text-[#98989D] line-through' : 'text-white'
+                  className={`text-base font-medium leading-snug transition-all duration-200 ${
+                    isDone ? 'text-[#98989D] line-through' : 'text-white'
                   }`}
                 >
                   {todo.title}
@@ -123,20 +123,14 @@ export default function TodoCard({
               </div>
             </div>
 
-            {/* ── Priority + Status row — visually distinct from labels ── */}
             <div className="flex flex-wrap items-center gap-2 mb-3 ml-8">
-              {/* Priority — icon + colored text, pill shape */}
               <span
                 className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${priority.bg} ${priority.text}`}
               >
                 <AlertCircle size={11} />
                 {priority.label}
               </span>
-
-              {/* Divider dot */}
               <span className="text-[#3A3A3C] text-xs">·</span>
-
-              {/* Status — square-ish rounded-md to differ from round priority pill */}
               <span
                 className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md ${status.bg} ${status.text}`}
               >
@@ -145,7 +139,6 @@ export default function TodoCard({
               </span>
             </div>
 
-            {/* ── Labels — smaller, no icon, clearly different row ── */}
             {todo.labels.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-2 ml-8">
                 {todo.labels.map((label) => {
@@ -163,12 +156,16 @@ export default function TodoCard({
               </div>
             )}
 
-            {/* Description */}
             {todo.description && (
-              <p className="text-[#98989D] text-sm leading-relaxed ml-8 mt-1">{todo.description}</p>
+              <p
+                className={`text-sm leading-relaxed ml-8 mt-1 transition-all duration-200 ${
+                  isDone ? 'text-[#48484A]' : 'text-[#98989D]'
+                }`}
+              >
+                {todo.description}
+              </p>
             )}
 
-            {/* Timestamp on mobile — shown below since header hides it */}
             <p className="text-xs text-[#48484A] ml-8 mt-2 sm:hidden">{timestamp}</p>
           </div>
         </CardContent>

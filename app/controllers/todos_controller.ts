@@ -4,10 +4,6 @@ import Label from '#models/label'
 import User from '#models/user'
 
 export default class TodosController {
-  /**
-   * GET /todos/data
-   * Returns all todos belonging to the authenticated user.
-   */
   async index({ response, jwtUser }: HttpContext) {
     const [todos, labels, user] = await Promise.all([
       Todo.query().where('userId', jwtUser.userId).preload('labels').orderBy('created_at', 'desc'),
@@ -15,13 +11,8 @@ export default class TodosController {
       User.findOrFail(jwtUser.userId),
     ])
 
-    const serialized = todos.map((todo) => ({
-      ...todo.serialize(),
-      isCompleted: Boolean(todo.isCompleted),
-    }))
-
     return response.ok({
-      todos: serialized,
+      todos: todos.map((t) => t.serialize()),
       labels,
       user: {
         fullName: user.fullName,
@@ -31,25 +22,14 @@ export default class TodosController {
     })
   }
 
-  /**
-   * GET /todos/:id
-   * Returns one todo — only if it belongs to the authenticated user.
-   */
   async show({ params, response, jwtUser }: HttpContext) {
     const todo = await Todo.query().where('id', params.id).where('userId', jwtUser.userId).first()
-
     if (!todo) return response.notFound({ message: 'Todo not found' })
-
     return response.json(todo)
   }
 
-  /**
-   * POST /todos
-   * Creates a new todo owned by the authenticated user.
-   */
   async store({ request, response, jwtUser }: HttpContext) {
-    // Added priority and status to the picked fields
-    const data = request.only(['title', 'description', 'isCompleted', 'priority', 'status'])
+    const data = request.only(['title', 'description', 'priority', 'status'])
     const labelIds: number[] = request.input('labelIds', [])
 
     const todo = await Todo.create({
@@ -64,45 +44,26 @@ export default class TodosController {
     }
 
     await todo.load('labels')
-
-    return response.created({
-      ...todo.serialize(),
-      isCompleted: Boolean(todo.isCompleted),
-    })
+    return response.created(todo.serialize())
   }
 
-  /**
-   * PUT /todos/:id
-   * Updates a todo — only if it belongs to the authenticated user.
-   */
   async update({ params, request, response, jwtUser }: HttpContext) {
     const todo = await Todo.query().where('id', params.id).where('userId', jwtUser.userId).first()
-
     if (!todo) return response.notFound({ message: 'Todo not found' })
 
-    // Added priority and status to the picked fields
-    const data = request.only(['title', 'description', 'isCompleted', 'priority', 'status'])
+    const data = request.only(['title', 'description', 'priority', 'status'])
     const labelIds: number[] = request.input('labelIds', [])
 
     await todo.merge(data).save()
     await todo.related('labels').sync(labelIds)
     await todo.load('labels')
 
-    return response.ok({
-      ...todo.serialize(),
-      isCompleted: Boolean(todo.isCompleted),
-    })
+    return response.ok(todo.serialize())
   }
 
-  /**
-   * DELETE /todos/:id
-   * Deletes a todo — only if it belongs to the authenticated user.
-   */
   async destroy({ params, response, jwtUser }: HttpContext) {
     const todo = await Todo.query().where('id', params.id).where('userId', jwtUser.userId).first()
-
     if (!todo) return response.notFound({ message: 'Todo not found' })
-
     await todo.delete()
     return response.ok({ message: 'Todo deleted' })
   }
