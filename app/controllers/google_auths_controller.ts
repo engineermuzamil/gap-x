@@ -8,7 +8,9 @@ export default class GoogleAuthController {
 
   async redirect({ ally, session }: HttpContext) {
     session.put('redirect.previousUrl', '/projects')
-    return ally.use('google').redirect()
+    return ally.use('google').redirect((request) => {
+      request.param('prompt', 'select_account')
+    })
   }
 
   async callback({ ally, auth, session, response }: HttpContext) {
