@@ -1,7 +1,8 @@
+import { useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { router } from '@inertiajs/react'
 import axios from 'axios'
-import { authHeaders, logoutFromTodos } from './todo-auth'
+import { authHeaders, getToken, logoutFromTodos } from './todo-auth'
 import type { Todo, Label } from './types'
 
 export const TODOS_KEY = ['todos'] as const
@@ -27,14 +28,28 @@ async function handle401(err: any) {
 
 export function useTodos() {
   const queryClient = useQueryClient()
+  const hasToken = getToken() !== null
+
+  useEffect(() => {
+    if (!hasToken) {
+      router.visit('/todo-auth/login')
+    }
+  }, [hasToken])
 
   const query = useQuery<TodosResponse>({
     queryKey: TODOS_KEY,
+    enabled: hasToken,
     queryFn: async () => {
       const response = await axios.get('/todos/data', { headers: authHeaders() })
       return response.data
     },
   })
+
+  useEffect(() => {
+    if (query.error) {
+      void handle401(query.error)
+    }
+  }, [query.error])
 
   const createTodo = useMutation({
     mutationFn: (input: TodoInput) => axios.post('/todos', input, { headers: authHeaders() }),
@@ -74,7 +89,7 @@ export function useTodos() {
     todos: query.data?.todos ?? [],
     labels: query.data?.labels ?? [],
     user: query.data?.user ?? null,
-    loading: query.isLoading,
+    loading: !hasToken || query.isLoading,
     error: query.isError ? 'Failed to load todos.' : null,
     submitting: createTodo.isPending || updateTodo.isPending,
     createTodo,
