@@ -10,7 +10,8 @@ import { logoutFromTodos } from '../../lib/todo-auth'
 import { Button } from '@/components/ui/button'
 import { useTodos } from '../../lib/use-todos'
 
-type ViewType = 'grid' | 'list'
+import { useTodoStore } from '../../lib/todo-store'
+import { validateTodo } from '../../lib/todo-schema'
 
 export default function Index() {
   const {
@@ -26,9 +27,10 @@ export default function Index() {
     toggleComplete,
   } = useTodos()
 
-  const [isFormVisible, setIsFormVisible] = useState(false)
-  const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
-  const [viewType, setViewType] = useState<ViewType>('grid')
+  const { viewType, isFormVisible, editingTodo, setViewType, openEditForm, closeForm, toggleForm } =
+    useTodoStore()
+
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
 
   const { data, setData, reset } = useForm({
     title: '',
@@ -40,18 +42,27 @@ export default function Index() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    const { success, errors } = validateTodo(data)
+
+    if (!success) {
+      setValidationErrors(errors)
+      return
+    }
+
+    setValidationErrors({})
+
     if (editingTodo) {
       await updateTodo.mutateAsync({ id: editingTodo.id, input: data })
     } else {
       await createTodo.mutateAsync(data)
     }
+
     reset()
-    setEditingTodo(null)
-    setIsFormVisible(false)
+    closeForm()
   }
 
   const handleEdit = (todo: Todo) => {
-    setEditingTodo(todo)
     setData({
       title: todo.title,
       description: todo.description ?? '',
@@ -59,17 +70,18 @@ export default function Index() {
       priority: todo.priority ?? 'medium',
       status: todo.status ?? 'pending',
     })
-    setIsFormVisible(true)
+    setValidationErrors({})
+    openEditForm(todo)
   }
 
   const handleDelete = (id: number) => deleteTodo.mutate(id)
 
   const handleToggleForm = () => {
-    setIsFormVisible(!isFormVisible)
     if (isFormVisible) {
       reset()
-      setEditingTodo(null)
+      setValidationErrors({})
     }
+    toggleForm()
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -152,6 +164,7 @@ export default function Index() {
               >
                 <TodoForm
                   data={data}
+                  validationErrors={validationErrors}
                   setData={setData}
                   submit={submit}
                   processing={submitting}
