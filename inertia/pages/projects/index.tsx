@@ -1,7 +1,7 @@
 import { Head, useForm, router, usePage } from '@inertiajs/react'
 import { Link } from '@adonisjs/inertia/react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PlusIcon, XIcon, ArrowLeft, LogOut } from 'lucide-react'
 import ProjectCard from './project-card'
 import ProjectForm from './project-form'
@@ -23,6 +23,11 @@ export default function Index() {
   const [isFormVisible, setIsFormVisible] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
   const [viewType, setViewType] = useState<ViewType>('grid')
+  const [avatarFailed, setAvatarFailed] = useState(false)
+
+  useEffect(() => {
+    setAvatarFailed(false)
+  }, [authUser.avatarUrl])
 
   const { data, setData, post, put, processing, reset } = useForm({
     title: '',
@@ -105,11 +110,13 @@ export default function Index() {
 
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-3 rounded-full border border-[#3A3A3C] bg-[#2C2C2E] px-3 py-2">
-                {authUser.avatarUrl ? (
+                {authUser.avatarUrl && !avatarFailed ? (
                   <img
                     src={authUser.avatarUrl}
                     alt={authUser.fullName ?? authUser.email}
                     className="h-9 w-9 rounded-full border border-[#3A3A3C] object-cover"
+                    referrerPolicy="no-referrer"
+                    onError={() => setAvatarFailed(true)}
                   />
                 ) : (
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0A84FF]/15 text-sm font-semibold text-[#7DB7FF]">
