@@ -8,6 +8,14 @@ export default class Note extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 
+  // ── Owner ─────────────────────────────────────────────────────────────────
+  @column()
+  declare userId: number
+
+  @belongsTo(() => User)
+  declare user: BelongsTo<typeof User>
+
+  // ── Fields ────────────────────────────────────────────────────────────────
   @column()
   declare title: string
 
@@ -23,17 +31,13 @@ export default class Note extends BaseModel {
   @column()
   declare shareToken: string | null
 
-  @column()
-  declare userId: number | null
-
-  @belongsTo(() => User)
-  declare user: BelongsTo<typeof User>
-
+  // ── Labels ────────────────────────────────────────────────────────────────
   @manyToMany(() => Label, {
     pivotTable: 'note_labels',
   })
   declare labels: ManyToMany<typeof Label>
 
+  // ── Timestamps ────────────────────────────────────────────────────────────
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

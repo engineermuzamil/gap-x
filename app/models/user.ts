@@ -7,6 +7,7 @@ import type { HasMany } from '@adonisjs/lucid/types/relations'
 import Todo from '#models/todo'
 import Note from '#models/note'
 import Project from '#models/project'
+import Bookmark from '#models/bookmark'
 
 export default class User extends compose(UserSchema, withAuthFinder(hash)) {
   @column()
@@ -25,6 +26,9 @@ export default class User extends compose(UserSchema, withAuthFinder(hash)) {
 
   @hasMany(() => Project)
   declare projects: HasMany<typeof Project>
+
+  @hasMany(() => Bookmark)
+  declare bookmarks: HasMany<typeof Bookmark>
 
   // ─── Helpers ───────────────────────────────────────────────────────────────
 
