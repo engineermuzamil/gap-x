@@ -72,3 +72,18 @@ export interface AuthUser {
   email: string
   avatarUrl: string | null
 }
+
+// ─── Bookmark ─────────────────────────────────────────────────────────────────────
+
+export interface Bookmark {
+  id: number
+  url: string
+  title: string | null
+  description: string | null
+  imageUrl: string | null
+  siteName: string | null
+  aiLabel: string | null
+  tldr: string | null
+  createdAt: string
+  updatedAt: string | null
+}

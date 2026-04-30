@@ -40,4 +40,6 @@ export default await Env.create(new URL('../', import.meta.url), {
   WEATHER_API_KEY: Env.schema.string(),
   IPINFO_TOKEN: Env.schema.string(),
   GIPHY_API_KEY: Env.schema.string(),
+
+  GEMINI_API_KEY: Env.schema.string(),
 })

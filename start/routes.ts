@@ -109,3 +109,16 @@ router.get('/weather', [controllers.Weather, 'show']).as('weather.show')
 
 // ─── Giphy API ────────────────────────────────────────────────────────────────
 router.get('/giphy/search', [controllers.Giphy, 'search']).as('giphy.search')
+
+// ─── Bookmarks ────────────────────────────────────────────────────────────────
+
+router
+  .group(() => {
+    router.get('/', [controllers.Bookmarks, 'index']).as('index')
+    router.post('/', [controllers.Bookmarks, 'store']).as('store')
+    router.delete('/:id', [controllers.Bookmarks, 'destroy']).as('destroy')
+    router.post('/:id/tldr', [controllers.Bookmarks, 'generateTldr']).as('tldr')
+  })
+  .prefix('/bookmarks')
+  .as('bookmarks')
+  .use(middleware.auth())

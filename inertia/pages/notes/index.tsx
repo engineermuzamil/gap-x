@@ -2,7 +2,7 @@ import { Head, useForm, router, usePage } from '@inertiajs/react'
 import { Link } from '@adonisjs/inertia/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import { PlusIcon, XIcon, ArrowLeft, LogOut } from 'lucide-react'
+import { PlusIcon, XIcon, ArrowLeft, LogOut, Bookmark } from 'lucide-react'
 import NoteCard from './note-card'
 import NoteForm from './note-form'
 import ViewSwitcher from './view-switcher'
@@ -64,7 +64,6 @@ export default function Index() {
   const pinnedNotes = sortedNotes.filter((n) => n.pinned)
   const unpinnedNotes = sortedNotes.filter((n) => !n.pinned)
 
-  // True when any filter/search is active — used for empty state message
   const hasActiveFilters = activeLabels.length > 0 || searchQuery.trim() !== ''
 
   const submit = (e: React.FormEvent) => {
@@ -146,7 +145,22 @@ export default function Index() {
               >
                 <ArrowLeft size={24} />
               </Link>
-              <h1 className="text-3xl font-bold">Notes</h1>
+
+              {/* ── Tab Navigation: Notes | Bookmarks ────────────────────── */}
+              <div className="flex items-center gap-1 bg-[#2C2C2E] rounded-xl p-1">
+                {/* Notes tab — active, so no link */}
+                <span className="px-4 py-1.5 text-sm font-medium text-white bg-[#3A3A3C] rounded-lg">
+                  Notes
+                </span>
+                {/* Bookmarks tab — navigates to the bookmarks page */}
+                <Link
+                  href="/bookmarks"
+                  className="flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium text-[#98989D] hover:text-white rounded-lg transition-colors"
+                >
+                  <Bookmark size={14} />
+                  Bookmarks
+                </Link>
+              </div>
             </div>
 
             <div className="flex items-center gap-3">
@@ -211,7 +225,7 @@ export default function Index() {
           {/* ── Label filter chips ─────────────────────────────────────────── */}
           <LabelFilter labels={labels} />
 
-          {/* ── Clear all button — shown when both search + labels are active── */}
+          {/* ── Clear all button ───────────────────────────────────────────── */}
           {activeLabels.length > 0 && searchQuery.trim() !== '' && (
             <div className="mb-4">
               <button
@@ -242,7 +256,6 @@ export default function Index() {
             </motion.div>
           ) : (
             <div className="space-y-6">
-              {/* Pinned */}
               {pinnedNotes.length > 0 && (
                 <section>
                   <div className="flex items-center gap-3 mb-3">
@@ -280,7 +293,6 @@ export default function Index() {
                 </section>
               )}
 
-              {/* Unpinned */}
               {unpinnedNotes.length > 0 && (
                 <div
                   className={
