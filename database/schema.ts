@@ -8,19 +8,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class BookmarkSchema extends BaseModel {
-  static $columns = [
-    'aiLabel',
-    'createdAt',
-    'description',
-    'id',
-    'imageUrl',
-    'siteName',
-    'title',
-    'tldr',
-    'updatedAt',
-    'url',
-    'userId',
-  ] as const
+  static $columns = ['aiLabel', 'createdAt', 'description', 'id', 'imageUrl', 'siteName', 'title', 'tldr', 'updatedAt', 'url', 'userId'] as const
   $columns = BookmarkSchema.$columns
   @column()
   declare aiLabel: string | null
@@ -71,18 +59,7 @@ export class NoteLabelSchema extends BaseModel {
 }
 
 export class NoteSchema extends BaseModel {
-  static $columns = [
-    'content',
-    'createdAt',
-    'deletedAt',
-    'id',
-    'imageUrl',
-    'pinned',
-    'shareToken',
-    'title',
-    'updatedAt',
-    'userId',
-  ] as const
+  static $columns = ['content', 'createdAt', 'deletedAt', 'id', 'imageUrl', 'pinned', 'shareToken', 'title', 'updatedAt', 'userId'] as const
   $columns = NoteSchema.$columns
   @column()
   declare content: string
@@ -107,15 +84,7 @@ export class NoteSchema extends BaseModel {
 }
 
 export class ProjectSchema extends BaseModel {
-  static $columns = [
-    'createdAt',
-    'description',
-    'id',
-    'status',
-    'title',
-    'updatedAt',
-    'userId',
-  ] as const
+  static $columns = ['createdAt', 'description', 'id', 'status', 'title', 'updatedAt', 'userId'] as const
   $columns = ProjectSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -145,16 +114,7 @@ export class TodoLabelSchema extends BaseModel {
 }
 
 export class TodoSchema extends BaseModel {
-  static $columns = [
-    'createdAt',
-    'description',
-    'id',
-    'priority',
-    'status',
-    'title',
-    'updatedAt',
-    'userId',
-  ] as const
+  static $columns = ['createdAt', 'description', 'id', 'priority', 'status', 'title', 'updatedAt', 'userId'] as const
   $columns = TodoSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -175,16 +135,7 @@ export class TodoSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = [
-    'avatarUrl',
-    'createdAt',
-    'email',
-    'fullName',
-    'googleId',
-    'id',
-    'password',
-    'updatedAt',
-  ] as const
+  static $columns = ['avatarUrl', 'createdAt', 'email', 'fullName', 'googleId', 'id', 'password', 'updatedAt'] as const
   $columns = UserSchema.$columns
   @column()
   declare avatarUrl: string | null
