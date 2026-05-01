@@ -1,9 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import hash from '@adonisjs/core/services/hash'
 import jwt from 'jsonwebtoken'
 import env from '#start/env'
 import User from '#models/user'
 import vine from '@vinejs/vine'
+
+const TODO_JWT_COOKIE = 'todo_jwt_token'
 
 // ─── Validation schemas ───────────────────────────────────────────────────────
 
@@ -35,7 +36,7 @@ export default class TodoAuthController {
   /**
    * POST /todo-auth/signup
    *
-   * Validates input, checks email is free, hashes the password,
+   * Validates input, checks email is free,
    * creates the user, then returns a JWT so the user is immediately logged in.
    */
   async signup({ request, response }: HttpContext) {
@@ -50,16 +51,20 @@ export default class TodoAuthController {
       return response.conflict({ message: 'Email is already taken' })
     }
 
-    // Always hash passwords before storing — never plain text
-    const hashedPassword = await hash.make(data.password)
-
     const user = await User.create({
       fullName: data.fullName,
       email: data.email,
-      password: hashedPassword,
+      password: data.password,
     })
 
     const token = generateToken(user.id, user.email)
+
+    response.cookie(TODO_JWT_COOKIE, token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: '7d',
+    })
 
     return response.created({
       message: 'Account created successfully',
@@ -82,6 +87,13 @@ export default class TodoAuthController {
       const user = await User.verifyCredentials(data.email, data.password)
       const token = generateToken(user.id, user.email)
 
+      response.cookie(TODO_JWT_COOKIE, token, {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: '7d',
+      })
+
       return response.ok({
         message: 'Logged in successfully',
         token,
@@ -100,6 +112,10 @@ export default class TodoAuthController {
    * so the frontend has a consistent logout pattern to call.
    */
   async logout({ response }: HttpContext) {
+    response.clearCookie(TODO_JWT_COOKIE, {
+      path: '/',
+    })
+
     return response.ok({ message: 'Logged out. Please delete your token on the client.' })
   }
 }

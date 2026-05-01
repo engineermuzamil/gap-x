@@ -2,9 +2,11 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Todo from '#models/todo'
 import Label from '#models/label'
 import User from '#models/user'
+import type { JwtHttpContext } from '../types/jwt.js'
 
 export default class TodosController {
-  async index({ response, jwtUser }: HttpContext) {
+  async index(ctx: HttpContext) {
+    const { response, jwtUser } = ctx as JwtHttpContext
     const [todos, labels, user] = await Promise.all([
       Todo.query().where('userId', jwtUser.userId).preload('labels').orderBy('created_at', 'desc'),
       Label.all(),
@@ -22,13 +24,15 @@ export default class TodosController {
     })
   }
 
-  async show({ params, response, jwtUser }: HttpContext) {
+  async show(ctx: HttpContext) {
+    const { params, response, jwtUser } = ctx as JwtHttpContext
     const todo = await Todo.query().where('id', params.id).where('userId', jwtUser.userId).first()
     if (!todo) return response.notFound({ message: 'Todo not found' })
     return response.json(todo)
   }
 
-  async store({ request, response, jwtUser }: HttpContext) {
+  async store(ctx: HttpContext) {
+    const { request, response, jwtUser } = ctx as JwtHttpContext
     const data = request.only(['title', 'description', 'priority', 'status'])
     const labelIds: number[] = request.input('labelIds', [])
 
@@ -47,7 +51,8 @@ export default class TodosController {
     return response.created(todo.serialize())
   }
 
-  async update({ params, request, response, jwtUser }: HttpContext) {
+  async update(ctx: HttpContext) {
+    const { params, request, response, jwtUser } = ctx as JwtHttpContext
     const todo = await Todo.query().where('id', params.id).where('userId', jwtUser.userId).first()
     if (!todo) return response.notFound({ message: 'Todo not found' })
 
@@ -61,7 +66,8 @@ export default class TodosController {
     return response.ok(todo.serialize())
   }
 
-  async destroy({ params, response, jwtUser }: HttpContext) {
+  async destroy(ctx: HttpContext) {
+    const { params, response, jwtUser } = ctx as JwtHttpContext
     const todo = await Todo.query().where('id', params.id).where('userId', jwtUser.userId).first()
     if (!todo) return response.notFound({ message: 'Todo not found' })
     await todo.delete()

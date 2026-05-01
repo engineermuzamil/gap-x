@@ -63,10 +63,9 @@ router
 
 // ─── Todos ────────────────────────────────────────────────────────────────────
 
-router.get('/todos', ({ inertia }) => inertia.render('todos/index', {})).as('todos.page')
-
 router
   .group(() => {
+    router.get('/', ({ inertia }) => inertia.render('todos/index', {})).as('page')
     router.get('/data', [controllers.Todos, 'index']).as('index')
     router.post('/', [controllers.Todos, 'store']).as('store')
     router.get('/:id', [controllers.Todos, 'show']).as('show')
@@ -75,7 +74,7 @@ router
   })
   .prefix('/todos')
   .as('todos')
-  .use(middleware.jwtAuth())
+  .use(middleware.jwtAuth({ redirectTo: '/todo-auth/login' }))
 
 // ─── Projects – Google OAuth ──────────────────────────────────────────────────
 
