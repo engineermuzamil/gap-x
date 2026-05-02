@@ -2,8 +2,7 @@ import { Head, Link, router, useForm } from '@inertiajs/react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, UserPlus } from 'lucide-react'
 import { useState } from 'react'
-import { authHeaders, getToken, signupForTodos } from '../../lib/todo-auth'
-import axios from 'axios'
+import { signupForTodos } from '../../lib/todo-auth'
 // ShadCN components
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
@@ -30,9 +29,7 @@ export default function TodoSignup() {
     setLoading(true)
     try {
       await signupForTodos(data)
-      const token = getToken()
-      if (token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      router.visit('/todos', { headers: authHeaders() })
+      router.visit('/todos')
     } catch (err: any) {
       setError(err.response?.data?.message ?? err.message ?? 'Something went wrong')
     } finally {

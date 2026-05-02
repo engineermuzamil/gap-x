@@ -28,7 +28,8 @@ async function handle401(err: any) {
 
 export function useTodos() {
   const queryClient = useQueryClient()
-  const hasToken = getToken() !== null
+  const token = getToken()
+  const hasToken = token !== null
 
   useEffect(() => {
     if (!hasToken) {
@@ -37,7 +38,7 @@ export function useTodos() {
   }, [hasToken])
 
   const query = useQuery<TodosResponse>({
-    queryKey: TODOS_KEY,
+    queryKey: [...TODOS_KEY, token],
     enabled: hasToken,
     queryFn: async () => {
       const response = await axios.get('/todos/data', { headers: authHeaders() })
