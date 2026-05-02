@@ -1,5 +1,4 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import hash from '@adonisjs/core/services/hash'
 import jwt from 'jsonwebtoken'
 import env from '#start/env'
 import User from '#models/user'
@@ -35,7 +34,7 @@ export default class TodoAuthController {
   /**
    * POST /todo-auth/signup
    *
-   * Validates input, checks email is free, hashes the password,
+   * Validates input, checks email is free,
    * creates the user, then returns a JWT so the user is immediately logged in.
    */
   async signup({ request, response }: HttpContext) {
@@ -50,13 +49,10 @@ export default class TodoAuthController {
       return response.conflict({ message: 'Email is already taken' })
     }
 
-    // Always hash passwords before storing — never plain text
-    const hashedPassword = await hash.make(data.password)
-
     const user = await User.create({
       fullName: data.fullName,
       email: data.email,
-      password: hashedPassword,
+      password: data.password,
     })
 
     const token = generateToken(user.id, user.email)
